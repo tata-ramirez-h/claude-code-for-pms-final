@@ -143,3 +143,26 @@ in this data.
 - Still to ask: per-responder recent-acceptance scores (Marcus or Wen Li),
   why the timeout was cut to 60 seconds, Ravi's reports and data after
   6 Sep, and last August's numbers to test seasonality.
+
+**Added at the end of Module 2**
+- The four interviews (wiki Customer interviews, run by Sofia Marino 2–5 Sep
+  for the console redesign) came three weeks after 4.2, so they say nothing
+  about why 4.2 was chosen. The wiki has no pre-4.2 research; the Q3 roadmap
+  entries for 4.2 are one line each, and nothing explains the timeout cut.
+- Weekly acceptance was flat at 75–78% for six weeks, then 54% in the week
+  of 10 Aug, and has crept back to 72.7% by 31 Aug. Overall 76.6% to 64.0%;
+  missed pings 2.3% to 18.0%, turned-down pings barely moved (21% to 18%).
+- Tickets: 40 before 12 Aug, 107 after; 83 open, including all 45 "gone
+  before I could answer" (15) and "gone quiet" (30). The quiet tickets are
+  about Farlight, The Undertow, Corporal Ashgrove and Halfmoon. Vesper and
+  Meteor Mite, two of the four hardest hit by pings, filed no tickets (Dot
+  and Kip only came up in interviews). Duplicate-alert tickets went 6 to 0,
+  so 4.2's duplicate-push fix seems to have worked. Many tickets repeat
+  word for word, so treat ticket counts loosely.
+- Availability Confidence was committed to 4.2 on the Q3 roadmap and did not
+  ship. Marcus's 14 Aug question (was the ranking change meant to apply to
+  responders who turn jobs down?) has no recorded answer.
+- Interviews vs tickets: they agree on vanishing and quiet; interviews alone
+  over-weighted "callout is live" signal, dark mode and text size, which are
+  old requests. Quiet outnumbers vanishing 2 to 1 in tickets. Likely link,
+  unconfirmed: responders who miss pings sink in the ranking and then go quiet.
