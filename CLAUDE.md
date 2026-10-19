@@ -250,3 +250,19 @@ in this data.
   may differ from production. To ask Wen Li or Marcus: per-responder ranking
   scores and travel times, and whether anything changed on those three
   responders around 12 Aug.
+
+**Added at the end of Module 3**
+- Headline for Helen Achebe: 18% of pings are now missed, up from 2% (110 of 611 vs
+  25 of 1,085; overall acceptance 76.6% to 64.0%). The break is on 12 Aug, not a
+  slow seasonal slide, and turned-down pings barely moved.
+- The story is who it hit, not the average: four responders (Farlight, The
+  Undertow, Meteor Mite, Vesper) went quiet, The Gale and a few others got
+  busier, and in Harborside, Old Town and Uptown outsiders now take most callouts.
+- Reading the routing code, the timeout cut probably started the misses and the
+  scoring rule made them stick; 4.2's ranking change alone should favor home
+  responders. Confirm with per-responder ranking scores and travel times.
+- Weekly acceptance recovering (72.7%) hides that the quiet four are still near
+  zero and tickets keep arriving, so don't report recovery on the headline alone.
+- Still to ask: Marcus or Wen Li (scores, travel times, anything that changed on
+  those accounts around 12 Aug), whether anyone answered Desmond Okafor's open
+  tickets, and last August's numbers.
