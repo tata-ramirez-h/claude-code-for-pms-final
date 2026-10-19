@@ -166,3 +166,37 @@ in this data.
   over-weighted "callout is live" signal, dark mode and text size, which are
   old requests. Quiet outnumbers vanishing 2 to 1 in tickets. Likely link,
   unconfirmed: responders who miss pings sink in the ranking and then go quiet.
+
+**Added after the per-responder ping analysis**
+- Saved data in `00-rook/data/`: `callout-history.csv` (responder x week,
+  pings and taken, 175 rows), `weekly-totals.csv`, `daily-totals-10-31-aug.csv`.
+  All come from the `pings` table. The 10 Aug week mixes before and after 4.2
+  (release was Wed 12 Aug), so it is split in the responder file.
+- Daily: acceptance was 68-75% on 10-11 Aug, then 40-53% on 12-16 Aug, with 4-12
+  missed pings a day (0-1 before). Weekly acceptance by week from 29 Jun: 75-78%
+  for six weeks, then 54.2, 65.8, 66.7, 72.7. Missed pings per week: 2-6, then 38,
+  28, 24, 21. Turned-down pings barely moved. Straight trend lines understate
+  the break.
+- Tickets lag pings: 5-8 a week, then 20, 27, 32 (peak, week of 24 Aug), 25.
+  Missed pings peaked a week earlier, so quiet-responder complaints keep
+  coming while the overall rate recovers.
+- Per responder: Farlight, The Undertow, Meteor Mite and Vesper fell from about
+  12 pings a week to 3-4. They now miss 53-64% of pings (1-4% before); the other
+  12 miss 10-18% (0-5% before). Ticket counts do not track the size of the drop:
+  Meteor Mite and Vesper filed none, Halfmoon and Corporal Ashgrove (about
+  25-30% fewer pings) filed 12 and 10. Interviews match the data: Kip's
+  Meteor Mite quiet and The Gale busy (The Gale pings up about 60%), Dot's
+  Vesper quiet stretches.
+- Ruled out in the data: the quiet four are not pinged late in the chain (71%
+  of their pings are still first position, like everyone else) and their misses
+  are not a night-hours effect (50-77% missed at every hour). They are reached
+  far less often, and when pinged first, 70% of the time they miss (17% for the
+  other 12). Only 56 pings after 4.2, so time-of-day splits are tiny.
+- Still open: why the four stopped answering (disengaged after early misses,
+  device or notification changes, or something else), and the ranking
+  mechanism. Rough check with history.py weights (-0.12 miss, +0.08 accept):
+  all four net negative in their first five days after 4.2. Not a replay.
+- To ask Marcus or Wen Li: did anything change on those four accounts or
+  devices around 12 Aug, and can they pull per-responder ranking scores over
+  time? Not testable here: slower response time (no column), seasonality (no
+  last August data).
