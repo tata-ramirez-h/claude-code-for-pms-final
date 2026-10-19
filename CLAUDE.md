@@ -200,3 +200,28 @@ in this data.
   devices around 12 Aug, and can they pull per-responder ranking scores over
   time? Not testable here: slower response time (no column), seasonality (no
   last August data).
+
+**Added after the home-base and who-took-it analysis**
+- Every responder has a home area (`responders.area`). Before 4.2, no ping
+  to a responder outside their home area was ever taken (0 of the out-of-area
+  pings). After 4.2, nine responders took 86 callouts outside home, all in
+  three areas: Harborside, Old Town and Uptown. In every other area outsiders
+  took none, before or after.
+- Those three areas belong to The Undertow, Vesper and Farlight, three of the
+  four who went quiet. In them, the first ping went to the home responder 75-85%
+  of the time before and 13-25% after. The home responder took 92-97% of
+  callouts before and 6-13% after. Outsiders who took them: Stormwrack 14,
+  Ironvale 9, The Drift 4 (Harborside); Captain Vantage 14, Nightwell 13, The
+  Longcast 4 (Old Town); Sgt. Falkirk 14, Cindermark 9, Sgt. Bulwark 5 (Uptown).
+- Eastgate has two responders, The Gale and Meteor Mite (same handler, Kip).
+  Meteor Mite's Eastgate pings fell from 62 to 9 and The Gale's went from 76 to
+  54: The Gale absorbed Meteor Mite's share. The Gale also gets about 4 pings a
+  week outside Eastgate (Midtown, Foundry Row), none taken.
+- Callouts with nobody taking them rose from 5.4% to 13.0% in the other areas
+  too, so that rise is not only in the three areas. Area is a rough proxy (no
+  travel times) and "first pinged" is inferred from send order; the ranking
+  scores are still not visible. Still open: why first pings left the home
+  responders in those three areas.
+- Saved: `00-rook/data/pings-by-responder-and-area.csv`,
+  `first-ping-and-taker-by-area.csv`, and `sankey-who-took-callouts.html`
+  (open in a browser).

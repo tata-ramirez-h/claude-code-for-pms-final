@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Who took callouts, before and after 4.2</title>
+<style>body{font-family:system-ui,sans-serif;max-width:720px;margin:24px auto;padding:0 16px;color:#0b0b0b;background:#fcfcfb}h1{font-size:20px}p{font-size:14px}.k{display:flex;gap:16px;font-size:12px;color:#52514e;margin:8px 0}.k span:before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;background:var(--c)}</style></head><body>
+<h1>Who took callouts in Harborside, Old Town and Uptown</h1>
+<p>Source: Rook database, pings and callouts tables. Before 4.2 = 29 Jun to 11 Aug, after = 12 Aug to 6 Sep. Ribbon width = callouts taken, same scale in both panels.</p>
+<div class="k"><span style="--c:#2a78d6">Home-area responder</span><span style="--c:#eb6834">Responder from another area (home base in brackets)</span></div>
+<p><b>Before 4.2 · 183 callouts taken</b></p><svg id="s1" viewBox="0 0 680 290" width="100%"></svg>
+<p><b>After 4.2 · 96 callouts taken</b></p><svg id="s2" viewBox="0 0 680 400" width="100%"></svg>
+<script>
+var NS='http://www.w3.org/2000/svg';
+function el(n,a,p){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;}
+var before={Harborside:[['The Undertow','',58,1]],'Old Town':[['Vesper','',70,1]],Uptown:[['Farlight','',55,1]]};
+var after={Harborside:[['The Undertow','',3,1],['Stormwrack','Southport',14,0],['Ironvale','Riverside',9,0],['The Drift','Greenway',4,0]],'Old Town':[['Vesper','',5,1],['Captain Vantage','Hillcrest',14,0],['Nightwell','Midtown',13,0],['The Longcast','Lakeshore',4,0]],Uptown:[['Farlight','',2,1],['Sgt. Falkirk','Kingsbridge',14,0],['Cindermark','Mill District',9,0],['Sgt. Bulwark','Foundry Row',5,0]]};
+function draw(id,data,gapL,gapR){var svg=document.getElementById(id),S=1.45,x0=190,x1=500,nw=12,areas=['Harborside','Old Town','Uptown'];
+var y=8,tot={};areas.forEach(function(a){tot[a]=data[a].reduce(function(s,d){return s+d[2];},0);});
+var ry=8,rpos={};areas.forEach(function(a){rpos[a]={y:ry,off:0};ry+=Math.max(tot[a]*S,4)+gapR;});
+areas.forEach(function(a){data[a].forEach(function(d){var h=Math.max(d[2]*S,2.5),col=d[3]?'#2a78d6':'#eb6834';
+var ty=rpos[a].y+rpos[a].off+h/2;rpos[a].off+=h;var sy=y+h/2,m=x0+nw+(x1-x0-nw)/2;
+var p=el('path',{d:'M'+(x0+nw)+','+sy+' C'+m+','+sy+' '+m+','+ty+' '+x1+','+ty,fill:'none',stroke:col,'stroke-width':h,opacity:0.5},svg);
+el('title',{},p).textContent=d[0]+(d[1]?' ('+d[1]+')':' (home responder)')+' took '+d[2]+' callouts in '+a;
+el('rect',{x:x0,y:y,width:nw,height:h,fill:col},svg);
+var t=el('text',{x:x0-6,y:sy+4,'text-anchor':'end','font-size':12},svg);t.textContent=d[0]+(d[1]?' ('+d[1]+')':'')+'  '+d[2];
+y+=h+gapL;});y+=gapL*2;});
+areas.forEach(function(a){var h=Math.max(tot[a]*S,4);el('rect',{x:x1,y:rpos[a].y,width:nw,height:h,fill:'#898781'},svg);
+var t=el('text',{x:x1+nw+8,y:rpos[a].y+h/2-2,'font-size':13,'font-weight':500},svg);t.textContent=a;
+var t2=el('text',{x:x1+nw+8,y:rpos[a].y+h/2+13,'font-size':11,fill:'#52514e'},svg);t2.textContent=tot[a]+' taken';});}
+draw('s1',before,6,26);draw('s2',after,5,26);
+</script></body></html>

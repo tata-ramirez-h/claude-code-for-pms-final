@@ -1,0 +1,9 @@
+period,area_group,callouts,first_ping_to_home_responder,taken_by_home_responder,taken_by_other_area_responder,unfilled
+before,Harborside,63,50,58,0,5
+before,Old Town,72,61,70,0,2
+before,Uptown,59,44,55,0,4
+before,all other areas,685,552,648,0,37
+after,Harborside,32,8,3,27,2
+after,Old Town,38,5,5,31,2
+after,Uptown,31,4,2,28,1
+after,all other areas,339,251,295,0,44
