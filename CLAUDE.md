@@ -225,3 +225,28 @@ in this data.
 - Saved: `00-rook/data/pings-by-responder-and-area.csv`,
   `first-ping-and-taker-by-area.csv`, and `sankey-who-took-callouts.html`
   (open in a browser).
+
+**Added after reading the routing code against the home-base data**
+- Location did not stop mattering. 4.2 raised the proximity weight (0.45 to
+  0.60) and cut recent acceptance (0.40 to 0.25), so history can now swing a
+  ranking by at most 0.25 points, not 0.40. In 12 of 15 areas outsiders took
+  no callouts, before or after. Only Harborside, Old Town and Uptown (the home
+  areas of The Undertow, Vesper and Farlight) stopped following geography. My
+  earlier charts showed only those three, which overstated it.
+- So the ranking-weight change probably is not the cause; it should favor home
+  responders. Working hypothesis, unconfirmed: the timeout cut (90s to 60s)
+  started the misses, and `history.py` made them stick (a miss counts as a
+  decline, -0.12, floor 0, no decay; a 2019 TODO notes it never recovers on its
+  own). Outsiders can outrank a home responder only if their travel time is
+  within about 19 minutes of the home responder's (my arithmetic from the
+  weights; travel times are not in the data). Check whether those three areas
+  border the outsiders' areas.
+- Not explained by the code: outsiders pinged for those three areas took 0 of 44
+  before 4.2 and 86 of 133 (65%) after, while outsiders pinged for other areas
+  still took none. They started saying yes.
+- Problem 6 (wide-area responder passed over, the target of the ranking
+  change): no evidence it worked, and in three areas the home responders kept
+  only 6-13% of their own area's callouts. Code read is the repo's version, which
+  may differ from production. To ask Wen Li or Marcus: per-responder ranking
+  scores and travel times, and whether anything changed on those three
+  responders around 12 Aug.
