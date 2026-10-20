@@ -266,3 +266,10 @@ in this data.
 - Still to ask: Marcus or Wen Li (scores, travel times, anything that changed on
   those accounts around 12 Aug), whether anyone answered Desmond Okafor's open
   tickets, and last August's numbers.
+
+**Added at the end of Module 4**
+- Reading `00-rook/code/dispatch-routing/` end to end: only `history.record_accepted` (+0.08, called from `offer.py` on a yes) ever adds points; `record_declined` (-0.12) fires for a decline and a miss alike. No decay, reset or manual boost, so a responder needs about 60% yes just to hold steady. Scores are an in-memory dictionary keyed by name in this repo version; production may differ. `availability.py` and the phone functions in `offer.py` are empty stubs, so travel time, pushes and answer detection are unseen.
+- The quiet four are not unpinged: they still get 3-4 pings a week and say yes only about 18-29% of the time. Per-day pings fell 66-75% for them. Out-of-area pings to them: 50 before, 22 after, 0 taken, so zones outside home won't pull them out.
+- Marcus's 14 Aug Slack question (did the ranking change apply to responders already turning jobs down?): in the code it applies to everyone and softens the history penalty. In the data, heavy decliners before 4.2 (13-29%) mostly kept or gained pings; the responders who lost them are the ones whose misses jumped. A reply is drafted but not sent. Intent is still unrecorded.
+- Rook Supply reads the availability record, and its shape is a contract: ask the Supply team before any availability change, including Availability Confidence. Supply's side is unseen.
+- Engineering levers if asked: count misses differently, restore 90s, raise the score floor, let scores drift to neutral (2019 TODO, a considered choice by an unnamed author), reset the four. Open: why the four miss (response time, device or notification), per-responder scores, why the timeout was cut.
