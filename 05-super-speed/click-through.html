@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiet responder click-through</title>
+<style>
+  :root {
+    --bg: #f5f6f8; --panel: #ffffff; --ink: #1c2230; --muted: #5d6677; --line: #dfe3ea;
+    --accent: #2f5fd0; --accent-soft: #e6edfc; --warn: #b4540a; --warn-soft: #fdf0e3;
+    --ok: #1f7a4d; --bar: #9db3e8; --bar-now: #d9822b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12151c; --panel: #1b202b; --ink: #e8ebf2; --muted: #9aa3b5; --line: #2c3342;
+      --accent: #7a9cf2; --accent-soft: #232c45; --warn: #f0a15a; --warn-soft: #3a2a18;
+      --ok: #62c493; --bar: #46598f; --bar-now: #e39a4c;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 20px 16px 48px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 16px; font-size: 14px; }
+  .bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 16px; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--panel); }
+  .seg button { border: 0; background: transparent; color: var(--ink); padding: 9px 14px; font: inherit; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+  .label { font-size: 13px; color: var(--muted); margin-right: -4px; }
+  .stage { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
+  .hidden { display: none !important; }
+
+  /* console */
+  .console-top { display: flex; justify-content: space-between; color: var(--muted); font-size: 13px; margin-bottom: 12px; }
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 640px) { .cards { grid-template-columns: 1fr; } }
+  .card { border: 1px solid var(--line); border-radius: 12px; padding: 14px; background: var(--bg); }
+  .card h2 { font-size: 17px; margin: 0 0 2px; }
+  .tag { display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 999px; margin-bottom: 8px; }
+  .tag.quiet { background: var(--warn-soft); color: var(--warn); }
+  .tag.busy { background: var(--accent-soft); color: var(--accent); }
+  .big { font-size: 26px; font-weight: 650; }
+  .big small { font-size: 13px; font-weight: 400; color: var(--muted); }
+  .bars { display: flex; align-items: flex-end; gap: 4px; height: 56px; margin: 10px 0 2px; }
+  .bars span { flex: 1; background: var(--bar); border-radius: 3px 3px 0 0; min-height: 3px; }
+  .bars span.now { background: var(--bar-now); }
+  .axis { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+  .btn { border: 1px solid var(--accent); background: transparent; color: var(--accent); padding: 8px 12px; border-radius: 8px; font: inherit; cursor: pointer; }
+  .btn:hover { background: var(--accent-soft); }
+  .btn.solid { background: var(--accent); color: #fff; }
+  .note { margin-top: 12px; border-left: 4px solid var(--warn); background: var(--warn-soft); padding: 12px 14px; border-radius: 0 10px 10px 0; }
+  .note p { margin: 0 0 6px; }
+  .note .added { border-top: 1px dashed var(--warn); margin-top: 8px; padding-top: 8px; }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 8px; }
+
+  /* phone */
+  .phones { display: flex; flex-wrap: wrap; gap: 24px; justify-content: center; align-items: flex-start; }
+  .phone { width: 280px; border: 8px solid #222834; border-radius: 34px; background: #0f131b; color: #eef1f7; min-height: 480px; padding: 22px 14px; position: relative; }
+  .phone .time { text-align: center; font-size: 42px; font-weight: 300; margin: 18px 0 2px; }
+  .phone .date { text-align: center; color: #9aa3b5; font-size: 13px; margin-bottom: 26px; }
+  .notif { background: #232a38; border-radius: 14px; padding: 12px; cursor: pointer; border: 0; width: 100%; text-align: left; color: inherit; font: inherit; }
+  .notif:hover { background: #2c3445; }
+  .notif b { display: block; font-size: 13px; color: #9db3e8; }
+  .notif span { font-size: 14px; }
+  .msg { background: #232a38; border-radius: 14px; padding: 14px; font-size: 15px; }
+  .msg p { margin: 0 0 8px; }
+  .msg .added { border-top: 1px dashed #4a556d; margin-top: 8px; padding-top: 8px; }
+  .back { background: none; border: 0; color: #9db3e8; font: inherit; cursor: pointer; padding: 0 0 10px; }
+  .phone-title { font-size: 13px; color: #9aa3b5; margin-bottom: 8px; }
+
+  .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
+  @media (max-width: 640px) { .facts { grid-template-columns: 1fr; } }
+  .fact { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; background: var(--panel); font-size: 14px; }
+  .fact b { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin-bottom: 4px; }
+  .foot { margin-top: 16px; font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Meteor Mite went quiet: what Kip and Meteor Mite would see</h1>
+  <p class="sub">Rough mock for Helen Achebe. Wording is from brief.md and numbers are from the callout history. Nothing here is built or shipped.</p>
+
+  <div class="bar">
+    <span class="label">Option</span>
+    <div class="seg" id="opt">
+      <button data-o="1" aria-pressed="true">1 · Words only</button>
+      <button data-o="2" aria-pressed="false">2 · Words + scoring change</button>
+    </div>
+    <span class="label">View</span>
+    <div class="seg" id="view">
+      <button data-v="console" aria-pressed="true">Kip's console</button>
+      <button data-v="phone" aria-pressed="false">Meteor Mite's phone</button>
+    </div>
+  </div>
+
+  <div class="stage">
+    <!-- Kip's console -->
+    <section id="console">
+      <div class="console-top"><span>Dispatch console · Kip's responders</span><span>Eastgate</span></div>
+      <div class="cards">
+        <div class="card">
+          <h2>Meteor Mite</h2>
+          <span class="tag quiet">Quiet since 12 Aug</span>
+          <div class="big">1 <small>ping this week · 11 a week before</small></div>
+          <div class="bars" aria-label="Pings per week">
+            <span style="height:92%"></span><span style="height:100%"></span><span style="height:83%"></span>
+            <span style="height:92%"></span><span style="height:100%"></span><span style="height:92%"></span>
+            <span class="now" style="height:58%"></span><span class="now" style="height:33%"></span>
+            <span class="now" style="height:17%"></span><span class="now" style="height:8%"></span>
+          </div>
+          <div class="axis"><span>29 Jun</span><span>12 Aug</span><span>31 Aug</span></div>
+          <button class="btn" id="why">Why is this?</button>
+          <div class="note hidden" id="kipnote">
+            <p><b>Quiet since 12 Aug.</b> Pings a week: 11 before, 1 now. The ping wait was cut from 90 to 60 seconds that day. We are checking if that is why. Meteor Mite is still on the list.</p>
+            <p class="added hidden" id="kipadded">Misses now count less against ranking.</p>
+          </div>
+        </div>
+        <div class="card">
+          <h2>The Gale</h2>
+          <span class="tag busy">Busier than before</span>
+          <div class="big">21 <small>pings this week · 13 a week before</small></div>
+          <div class="bars" aria-label="Pings per week">
+            <span style="height:62%"></span><span style="height:57%"></span><span style="height:62%"></span>
+            <span style="height:67%"></span><span style="height:62%"></span><span style="height:62%"></span>
+            <span class="now" style="height:52%"></span><span class="now" style="height:81%"></span>
+            <span class="now" style="height:95%"></span><span class="now" style="height:100%"></span>
+          </div>
+          <div class="axis"><span>29 Jun</span><span>12 Aug</span><span>31 Aug</span></div>
+          <div class="hint">Same city, same week. Kip's two cards now tell two different stories.</div>
+        </div>
+      </div>
+      <p class="hint">Click "Why is this?" on Meteor Mite's card. Orange bars are weeks from 12 Aug on. The 10 Aug week shows only its after-release days.</p>
+    </section>
+
+    <!-- Meteor Mite's phone -->
+    <section id="phone" class="hidden">
+      <div class="phones">
+        <div class="phone">
+          <div class="time">9:41</div>
+          <div class="date">Phone lock screen</div>
+          <button class="notif" id="notif">
+            <b>Rook Dispatch</b>
+            <span>We see you are getting fewer pings since 12 Aug. Tap to read.</span>
+          </button>
+          <p class="hint" style="color:#9aa3b5">Tap the notification.</p>
+        </div>
+        <div class="phone hidden" id="screen2">
+          <button class="back" id="back">‹ Back</button>
+          <div class="phone-title">Message from Rook Dispatch</div>
+          <div class="msg">
+            <p>We see you are getting fewer pings since 12 Aug. We are checking why. You are still on the list.</p>
+            <p class="added hidden" id="phoneadded">Misses in your first weeks back will not hurt your place.</p>
+          </div>
+        </div>
+      </div>
+      <p class="hint">Can the phone show a message at all? Not known yet. That code is not visible to me, and engineering has to confirm.</p>
+    </section>
+  </div>
+
+  <div class="facts">
+    <div class="fact"><b>What changes in code</b><span id="code">Text only. No change to scoring.</span></div>
+    <div class="fact"><b>Who may lose pings</b><span id="lose">No one.</span></div>
+    <div class="fact"><b>Needs sign-off from</b><span id="sign">Sofia Marino (screens). Marcus Oyelaran (can the phone show a message?).</span></div>
+    <div class="fact"><b>Not known yet</b><span>Why the four quiet responders stopped answering. If the cause is a phone or alert problem, this wording must change.</span></div>
+  </div>
+  <p class="foot">Pings per week are for Meteor Mite and The Gale from the callout history (29 Jun to 6 Sep). The last bar for each is the week of 31 Aug.</p>
+</div>
+
+<script>
+  var opt = 1, view = "console";
+  function $(id) { return document.getElementById(id); }
+  function render() {
+    var two = opt === 2;
+    $("kipadded").classList.toggle("hidden", !two);
+    $("phoneadded").classList.toggle("hidden", !two);
+    $("code").textContent = two ? "Also changes how a miss is scored in history.py. Wen Li and Marcus Oyelaran must sign off." : "Text only. No change to scoring.";
+    $("lose").textContent = two ? "The Gale and the busiest responders." : "No one.";
+    $("sign").textContent = two ? "Wen Li and Marcus Oyelaran. Rook Supply to confirm the availability record is untouched. Sofia Marino (screens)." : "Sofia Marino (screens). Marcus Oyelaran (can the phone show a message?).";
+    $("console").classList.toggle("hidden", view !== "console");
+    $("phone").classList.toggle("hidden", view !== "phone");
+    Array.prototype.forEach.call(document.querySelectorAll("#opt button"), function (b) { b.setAttribute("aria-pressed", String(+b.dataset.o === opt)); });
+    Array.prototype.forEach.call(document.querySelectorAll("#view button"), function (b) { b.setAttribute("aria-pressed", String(b.dataset.v === view)); });
+  }
+  document.querySelectorAll("#opt button").forEach(function (b) { b.onclick = function () { opt = +b.dataset.o; render(); }; });
+  document.querySelectorAll("#view button").forEach(function (b) { b.onclick = function () { view = b.dataset.v; render(); }; });
+  $("why").onclick = function () { $("kipnote").classList.toggle("hidden"); };
+  $("notif").onclick = function () { $("screen2").classList.remove("hidden"); };
+  $("back").onclick = function () { $("screen2").classList.add("hidden"); };
+  render();
+</script>
+</body>
+</html>

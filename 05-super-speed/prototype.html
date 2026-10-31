@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dispatch console prototype</title>
+<style>
+  :root {
+    --bg: #eef0f4; --panel: #ffffff; --ink: #1b2130; --muted: #5f6879; --line: #dde1e8;
+    --nav: #1b2130; --navink: #dfe4ee; --accent: #2f5fd0; --accent-soft: #e6edfc;
+    --warn: #a8480a; --warn-soft: #fdf0e3; --ok: #1d7a4a; --ok-soft: #e3f4ea;
+    --bar: #9db3e8; --bar-now: #d9822b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12151c; --panel: #1b202b; --ink: #e8ebf2; --muted: #9aa3b5; --line: #2c3342;
+      --nav: #0c0f15; --navink: #c9d0df; --accent: #7a9cf2; --accent-soft: #232c45;
+      --warn: #f0a15a; --warn-soft: #3a2a18; --ok: #62c493; --ok-soft: #173326;
+      --bar: #46598f; --bar-now: #e39a4c;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .hidden { display: none !important; }
+
+  .topnav { background: var(--nav); color: var(--navink); display: flex; align-items: center; gap: 18px; padding: 0 16px; height: 48px; }
+  .topnav .logo { font-weight: 700; letter-spacing: .02em; color: #fff; }
+  .topnav a { color: var(--navink); text-decoration: none; font-size: 14px; padding: 14px 2px; border-bottom: 2px solid transparent; }
+  .topnav a.on { color: #fff; border-color: #7a9cf2; }
+  .topnav .who { margin-left: auto; font-size: 13px; }
+
+  .layout { display: grid; grid-template-columns: 200px 1fr; min-height: calc(100vh - 48px); }
+  @media (max-width: 760px) { .layout { grid-template-columns: 1fr; } .side { display: none; } }
+  .side { background: var(--panel); border-right: 1px solid var(--line); padding: 16px 12px; font-size: 14px; }
+  .side h3 { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 14px 8px 6px; }
+  .side div { padding: 7px 8px; border-radius: 6px; color: var(--muted); }
+  .side div.on { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+
+  main { padding: 18px 20px 40px; max-width: 1000px; }
+  .titlerow { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  h1 { font-size: 20px; margin: 0; }
+  .crumb { color: var(--muted); font-size: 13px; }
+  .switch { display: inline-flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; background: var(--panel); }
+  .switch button { border: 0; background: transparent; color: var(--ink); padding: 7px 12px; font: inherit; font-size: 13px; cursor: pointer; }
+  .switch button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+  .proto { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+
+  .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 600px) { .summary { grid-template-columns: 1fr; } }
+  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; }
+  .stat b { font-size: 22px; display: block; }
+  .stat span { color: var(--muted); font-size: 13px; }
+
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
+  @media (max-width: 700px) { .cards { grid-template-columns: 1fr; } }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .head h2 { font-size: 17px; margin: 0; }
+  .area { color: var(--muted); font-size: 13px; }
+  .tag { display: inline-block; font-size: 12px; padding: 2px 9px; border-radius: 999px; margin: 6px 0 6px; }
+  .tag.quiet { background: var(--warn-soft); color: var(--warn); }
+  .tag.busy { background: var(--accent-soft); color: var(--accent); }
+  .big { font-size: 28px; font-weight: 650; line-height: 1.1; }
+  .big small { font-size: 13px; font-weight: 400; color: var(--muted); }
+  .bars { display: flex; align-items: flex-end; gap: 4px; height: 52px; margin: 10px 0 2px; }
+  .bars span { flex: 1; background: var(--bar); border-radius: 3px 3px 0 0; min-height: 3px; }
+  .bars span.now { background: var(--bar-now); }
+  .axis { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .btn { border: 1px solid var(--accent); background: transparent; color: var(--accent); padding: 7px 12px; border-radius: 8px; font: inherit; font-size: 14px; cursor: pointer; }
+  .btn:hover { background: var(--accent-soft); }
+  .btn[aria-expanded="true"] { background: var(--accent); color: #fff; }
+
+  .why { margin-top: 12px; border-left: 4px solid var(--warn); background: var(--warn-soft); padding: 12px 14px; border-radius: 0 10px 10px 0; }
+  .why p { margin: 0 0 6px; }
+  .why .added { border-top: 1px dashed var(--warn); margin-top: 8px; padding-top: 8px; }
+  .why .small { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .hint { color: var(--muted); font-size: 13px; margin: 8px 0 0; }
+
+  .note { margin-top: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; font-size: 14px; }
+  .note b { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: 4px; }
+
+  /* phone preview */
+  .overlay { position: fixed; inset: 0; background: rgba(10, 13, 20, .6); display: flex; align-items: center; justify-content: center; padding: 16px; }
+  .modal { background: var(--panel); border-radius: 16px; padding: 18px; max-width: 360px; width: 100%; }
+  .modal h3 { margin: 0 0 4px; font-size: 16px; }
+  .phone { margin: 12px auto 0; width: 250px; border: 8px solid #222834; border-radius: 30px; background: #0f131b; color: #eef1f7; min-height: 360px; padding: 18px 12px; }
+  .phone .time { text-align: center; font-size: 38px; font-weight: 300; margin: 10px 0 2px; }
+  .phone .date { text-align: center; color: #9aa3b5; font-size: 12px; margin-bottom: 20px; }
+  .notif, .msg { background: #232a38; border-radius: 13px; padding: 11px; font-size: 14px; width: 100%; text-align: left; color: inherit; border: 0; font-family: inherit; }
+  .notif { cursor: pointer; }
+  .notif:hover { background: #2c3445; }
+  .notif b { display: block; font-size: 12px; color: #9db3e8; }
+  .msg p { margin: 0 0 8px; }
+  .msg .added { border-top: 1px dashed #4a556d; margin-top: 8px; padding-top: 8px; }
+  .back { background: none; border: 0; color: #9db3e8; font: inherit; font-size: 14px; cursor: pointer; padding: 0 0 8px; }
+  .close { margin-top: 12px; width: 100%; }
+</style>
+</head>
+<body>
+  <nav class="topnav">
+    <span class="logo">ROOK · Dispatch</span>
+    <a href="#" class="on">Coverage</a><a href="#">Callouts</a><a href="#">Responders</a><a href="#">Reports</a>
+    <span class="who">Kip · Handler</span>
+  </nav>
+
+  <div class="layout">
+    <aside class="side">
+      <h3>My responders</h3>
+      <div class="on">Coverage</div>
+      <div>Meteor Mite</div>
+      <div>The Gale</div>
+      <h3>Console</h3>
+      <div>Filters</div>
+      <div>Settings</div>
+    </aside>
+
+    <main>
+      <div class="titlerow">
+        <div>
+          <h1>Coverage</h1>
+          <div class="crumb">Your responders · week of 31 Aug</div>
+        </div>
+        <div class="switch" id="opt" role="group" aria-label="Which option to show">
+          <button data-o="1" aria-pressed="true">Option 1: words only</button>
+          <button data-o="2" aria-pressed="false">Option 2: words + scoring change</button>
+        </div>
+      </div>
+      <div class="proto">Prototype for Helen Achebe. Wording is from brief.md and the numbers are from the callout history. Nothing here is built or shipped.</div>
+
+      <div class="summary">
+        <div class="stat"><b>2</b><span>responders on your desk</span></div>
+        <div class="stat"><b>22</b><span>pings this week across both</span></div>
+        <div class="stat"><b>1</b><span>responder gone quiet</span></div>
+      </div>
+
+      <div class="cards">
+        <section class="card" aria-label="Meteor Mite">
+          <div class="head"><h2>Meteor Mite</h2><span class="area">Eastgate</span></div>
+          <span class="tag quiet">Quiet since 12 Aug</span>
+          <div class="big">1 <small>ping this week · 11 a week before</small></div>
+          <div class="bars" aria-label="Pings per week, 29 Jun to 31 Aug">
+            <span style="height:92%"></span><span style="height:100%"></span><span style="height:83%"></span>
+            <span style="height:92%"></span><span style="height:100%"></span><span style="height:92%"></span>
+            <span class="now" style="height:58%"></span><span class="now" style="height:33%"></span>
+            <span class="now" style="height:17%"></span><span class="now" style="height:8%"></span>
+          </div>
+          <div class="axis"><span>29 Jun</span><span>12 Aug</span><span>31 Aug</span></div>
+          <div class="actions">
+            <button class="btn" id="why" aria-expanded="false" aria-controls="whybox">Why is this?</button>
+            <button class="btn" id="preview">What Meteor Mite sees</button>
+          </div>
+          <div class="why hidden" id="whybox">
+            <p><b>Quiet since 12 Aug.</b> Pings a week: 11 before, 1 now. The ping wait was cut from 90 to 60 seconds that day. We are checking if that is why. Meteor Mite is still on the list.</p>
+            <p class="added hidden" id="added1">Misses now count less against ranking.</p>
+            <div class="small">We have not proven the cause yet.</div>
+          </div>
+        </section>
+
+        <section class="card" aria-label="The Gale">
+          <div class="head"><h2>The Gale</h2><span class="area">Eastgate</span></div>
+          <span class="tag busy">Busier than before</span>
+          <div class="big">21 <small>pings this week · 13 a week before</small></div>
+          <div class="bars" aria-label="Pings per week, 29 Jun to 31 Aug">
+            <span style="height:62%"></span><span style="height:57%"></span><span style="height:62%"></span>
+            <span style="height:67%"></span><span style="height:62%"></span><span style="height:62%"></span>
+            <span class="now" style="height:52%"></span><span class="now" style="height:81%"></span>
+            <span class="now" style="height:95%"></span><span class="now" style="height:100%"></span>
+          </div>
+          <div class="axis"><span>29 Jun</span><span>12 Aug</span><span>31 Aug</span></div>
+          <p class="hint" style="margin:0">Same area, same week. The two cards are the story Kip could not explain.</p>
+        </section>
+      </div>
+
+      <div class="note"><b id="notehead">What changes in code (Option 1)</b><span id="notebody">Text only. No change to scoring. Nobody loses pings.</span></div>
+    </main>
+  </div>
+
+  <div class="overlay hidden" id="overlay">
+    <div class="modal" role="dialog" aria-label="What Meteor Mite sees on their phone">
+      <h3>What Meteor Mite sees</h3>
+      <div class="hint" style="margin:0">Mock of the phone message. We do not know yet if the phone can show it.</div>
+      <div class="phone">
+        <div id="lock">
+          <div class="time">9:41</div>
+          <div class="date">Lock screen</div>
+          <button class="notif" id="notif"><b>Rook Dispatch</b>We see you are getting fewer pings since 12 Aug. Tap to read.</button>
+        </div>
+        <div id="read" class="hidden">
+          <button class="back" id="back">‹ Back</button>
+          <div class="msg">
+            <p>We see you are getting fewer pings since 12 Aug. We are checking why. You are still on the list.</p>
+            <p class="added hidden" id="added2">Misses in your first weeks back will not hurt your place.</p>
+          </div>
+        </div>
+      </div>
+      <button class="btn close" id="close">Close</button>
+    </div>
+  </div>
+
+<script>
+  var opt = 1;
+  function $(id) { return document.getElementById(id); }
+  function render() {
+    var two = opt === 2;
+    $("added1").classList.toggle("hidden", !two);
+    $("added2").classList.toggle("hidden", !two);
+    $("notehead").textContent = "What changes in code (Option " + opt + ")";
+    $("notebody").textContent = two
+      ? "Also changes how a miss is scored in history.py. Needs sign-off from Wen Li and Marcus Oyelaran, and Rook Supply to confirm the availability record is untouched. The Gale and the busiest responders may lose pings."
+      : "Text only. No change to scoring. Nobody loses pings. The phone message needs engineering to confirm it can be shown.";
+    Array.prototype.forEach.call(document.querySelectorAll("#opt button"), function (b) {
+      b.setAttribute("aria-pressed", String(+b.dataset.o === opt));
+    });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll("#opt button"), function (b) {
+    b.onclick = function () { opt = +b.dataset.o; render(); };
+  });
+  $("why").onclick = function () {
+    var box = $("whybox"), open = box.classList.toggle("hidden") === false;
+    this.setAttribute("aria-expanded", String(open));
+  };
+  $("preview").onclick = function () { $("lock").classList.remove("hidden"); $("read").classList.add("hidden"); $("overlay").classList.remove("hidden"); };
+  $("notif").onclick = function () { $("lock").classList.add("hidden"); $("read").classList.remove("hidden"); };
+  $("back").onclick = function () { $("read").classList.add("hidden"); $("lock").classList.remove("hidden"); };
+  $("close").onclick = function () { $("overlay").classList.add("hidden"); };
+  $("overlay").onclick = function (e) { if (e.target === this) this.classList.add("hidden"); };
+  document.querySelectorAll(".topnav a").forEach(function (a) { a.onclick = function (e) { e.preventDefault(); }; });
+  render();
+</script>
+</body>
+</html>
