@@ -129,10 +129,6 @@
           <h1>Coverage</h1>
           <div class="crumb">Your responders · week of <span id="crumbweek">31 Aug</span></div>
         </div>
-        <div class="switch" id="opt" role="group" aria-label="Which option to show">
-          <button data-o="1" aria-pressed="true">Option 1: words only</button>
-          <button data-o="2" aria-pressed="false">Option 2: words + scoring change</button>
-        </div>
       </div>
       <div class="proto">Prototype for Helen Achebe. Wording is from brief.md and the numbers are from the callout history. Nothing here is built or shipped.</div>
 
@@ -162,7 +158,7 @@
           </div>
           <div class="why hidden" id="whybox">
             <p><b>Quiet since 12 Aug.</b> Pings a week: 11 before, <span id="nownum">1</span> now. The ping wait was cut from 90 to 60 seconds that day. We are checking if that is why. Meteor Mite is still on the list.</p>
-            <p class="added hidden" id="added1">Misses now count less against ranking.</p>
+            <p class="added" id="added1">Misses now count less against ranking.</p>
             <div class="small">We have not proven the cause yet.</div>
           </div>
         </section>
@@ -177,7 +173,9 @@
         </section>
       </div>
 
-      <div class="note"><b id="notehead">What changes in code (Option 1)</b><span id="notebody">Text only. No change to scoring. Nobody loses pings.</span></div>
+      <div class="note"><b>The proposal in one line</b>Tell Kip and Meteor Mite what is happening, and change how a miss is scored so Meteor Mite has a real way back. The recovery rule is in <code>history.py</code>: a miss costs half as much as a "no", and scores drift back toward neutral. Wen Li and Marcus Oyelaran set the size and the time.</div>
+      <div class="note"><b>Who may lose pings</b>The Gale and the busiest responders.</div>
+      <div class="note"><b>Needs sign-off from</b>Wen Li and Marcus Oyelaran (the rule, and whether the phone can show a message). Rook Supply to confirm the availability record is untouched. Sofia Marino for the screens.</div>
     </main>
   </div>
 
@@ -195,7 +193,7 @@
           <button class="back" id="back">‹ Back</button>
           <div class="msg">
             <p>We see you are getting fewer pings since 12 Aug. We are checking why. You are still on the list.</p>
-            <p class="added hidden" id="added2">Misses in your first weeks back will not hurt your place.</p>
+            <p class="added" id="added2">Missed pings now count less against your place, and it recovers over time.</p>
           </div>
         </div>
       </div>
@@ -204,7 +202,7 @@
   </div>
 
 <script>
-  var opt = 1, idx = 9, noteOpen = false, timer = null;
+  var idx = 9, noteOpen = false, timer = null;
   var WEEKS = ["29 Jun","6 Jul","13 Jul","20 Jul","27 Jul","3 Aug","10 Aug","17 Aug","24 Aug","31 Aug"];
   // Pings per week and pings taken, from the callout history. The 10 Aug week shows only its days after 12 Aug.
   var MM = { p: [11,12,10,11,12,11,7,4,2,1], t: [7,9,6,7,9,8,2,1,0,0] };
@@ -223,7 +221,7 @@
     });
   }
   function render() {
-    var two = opt === 2, quiet = idx >= 7, release = idx === 6;
+    var quiet = idx >= 7, release = idx === 6;
     var p = MM.p[idx], t = MM.t[idx];
     $("weeklabel").textContent = WEEKS[idx];
     $("crumbweek").textContent = WEEKS[idx];
@@ -252,22 +250,9 @@
     // summary
     $("stat2").textContent = p + g;
     $("stat3").textContent = quiet ? 1 : 0;
-    // option text
-    $("added1").classList.toggle("hidden", !two);
-    $("added2").classList.toggle("hidden", !two);
-    $("notehead").textContent = "What changes in code (Option " + opt + ")";
-    $("notebody").textContent = two
-      ? "Also changes how a miss is scored in history.py. Needs sign-off from Wen Li and Marcus Oyelaran, and Rook Supply to confirm the availability record is untouched. The Gale and the busiest responders may lose pings."
-      : "Text only. No change to scoring. Nobody loses pings. The phone message needs engineering to confirm it can be shown.";
-    Array.prototype.forEach.call(document.querySelectorAll("#opt button"), function (b) {
-      b.setAttribute("aria-pressed", String(+b.dataset.o === opt));
-    });
     $("week").value = idx;
   }
   function stop() { if (timer) { clearInterval(timer); timer = null; $("play").innerHTML = "&#9654; Replay Meteor Mite"; } }
-  Array.prototype.forEach.call(document.querySelectorAll("#opt button"), function (b) {
-    b.onclick = function () { opt = +b.dataset.o; render(); };
-  });
   $("week").oninput = function () { stop(); idx = +this.value; if (idx >= 7) noteOpen = true; render(); };
   $("play").onclick = function () {
     if (timer) { stop(); return; }
