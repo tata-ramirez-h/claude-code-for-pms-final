@@ -3,277 +3,476 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dispatch console prototype</title>
+<title>Rook Quest 4.2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #eef0f4; --panel: #ffffff; --ink: #1b2130; --muted: #5f6879; --line: #dde1e8;
-    --nav: #1b2130; --navink: #dfe4ee; --accent: #2f5fd0; --accent-soft: #e6edfc;
-    --warn: #a8480a; --warn-soft: #fdf0e3; --ok: #1d7a4a; --ok-soft: #e3f4ea;
-    --bar: #9db3e8; --bar-now: #d9822b;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #12151c; --panel: #1b202b; --ink: #e8ebf2; --muted: #9aa3b5; --line: #2c3342;
-      --nav: #0c0f15; --navink: #c9d0df; --accent: #7a9cf2; --accent-soft: #232c45;
-      --warn: #f0a15a; --warn-soft: #3a2a18; --ok: #62c493; --ok-soft: #173326;
-      --bar: #46598f; --bar-now: #e39a4c;
-    }
+    --night: #0f1226; --ink: #f8f1d8; --gold: #fbbf24; --orange: #c2410c; --sky: #6b8cff;
+    --panel: #14183a; --line: #f8f1d8; --red: #ef4444; --green: #4ade80;
+    --pix: 'Press Start 2P', 'Courier New', monospace;
+    --body: ui-monospace, 'SF Mono', Menlo, Consolas, 'Courier New', monospace;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  body { margin: 0; background: var(--night); color: var(--ink); font-family: var(--body); min-height: 100vh; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 14px 12px 28px; }
+  h1 { font: 14px/1.5 var(--pix); margin: 0 0 6px; color: var(--gold); text-shadow: 2px 2px 0 #7c2d12; }
+  .sub { font-size: 12px; color: #b9bfdc; margin: 0 0 12px; line-height: 1.5; }
+  #frame { position: relative; width: 100%; aspect-ratio: 16 / 9; border: 4px solid var(--line); border-radius: 6px; background: var(--sky); overflow: hidden; box-shadow: 0 0 0 4px #000; }
+  canvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; touch-action: none; }
+  #ui { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 10px; background: rgba(10, 12, 30, .55); }
+  #ui.hidden { display: none; }
+  .card { background: var(--panel); border: 4px double var(--line); border-radius: 4px; padding: 14px 18px; max-width: 640px; width: 100%; max-height: 100%; overflow: auto; font-size: 13px; line-height: 1.55; }
+  .card h2 { font: 12px/1.6 var(--pix); margin: 0 0 8px; color: var(--gold); }
+  .card h3 { font: 9px/1.6 var(--pix); margin: 10px 0 4px; color: var(--green); }
+  .card p { margin: 0 0 8px; }
+  .card ul { margin: 0 0 8px; padding-left: 18px; }
+  .card li { margin-bottom: 3px; }
+  .say { background: #0a0d22; border: 2px solid var(--gold); padding: 8px 10px; margin: 0 0 8px; font-size: 12px; }
+  .say b { color: var(--gold); display: block; font: 8px/1.6 var(--pix); margin-bottom: 3px; }
+  .btns { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+  .btn { font: 10px/1.4 var(--pix); background: var(--orange); color: #fff; border: 3px solid #000; box-shadow: inset -3px -3px 0 #7c2d12, inset 3px 3px 0 #fb923c; padding: 10px 14px; cursor: pointer; }
+  .btn:hover, .btn:focus-visible { background: #ea580c; outline: 2px solid var(--gold); }
+  .btn.alt { background: #334155; box-shadow: inset -3px -3px 0 #1e293b, inset 3px 3px 0 #64748b; }
+  .qb { display: inline-block; vertical-align: middle; font: 12px/1 var(--pix); width: 34px; height: 34px; margin: 4px 8px 4px 0; background: #f59e0b; color: #fff; border: 3px solid #7c2d12; box-shadow: inset 3px 3px 0 #fde68a; cursor: pointer; text-shadow: 2px 2px 0 #7c2d12; }
+  .qb:hover { transform: translateY(-3px); }
+  .qb.bump { animation: bump .25s; }
+  @keyframes bump { 50% { transform: translateY(-9px); } }
+  .qrow { display: flex; align-items: flex-start; gap: 4px; margin-bottom: 4px; }
+  .fact { padding-top: 7px; font-size: 12.5px; }
+  .fact.off { color: #8a91b4; font-size: 11px; }
+  #pad { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; align-items: center; }
+  #pad .btn { padding: 12px 18px; }
+  #pad .hint { font-size: 12px; color: #b9bfdc; flex: 1; min-width: 180px; }
+
   .hidden { display: none !important; }
-
-  .topnav { background: var(--nav); color: var(--navink); display: flex; align-items: center; gap: 18px; padding: 0 16px; height: 48px; }
-  .topnav .logo { font-weight: 700; letter-spacing: .02em; color: #fff; }
-  .topnav a { color: var(--navink); text-decoration: none; font-size: 14px; padding: 14px 2px; border-bottom: 2px solid transparent; }
-  .topnav a.on { color: #fff; border-color: #7a9cf2; }
-  .topnav .who { margin-left: auto; font-size: 13px; }
-
-  .layout { display: grid; grid-template-columns: 200px 1fr; min-height: calc(100vh - 48px); }
-  @media (max-width: 760px) { .layout { grid-template-columns: 1fr; } .side { display: none; } }
-  .side { background: var(--panel); border-right: 1px solid var(--line); padding: 16px 12px; font-size: 14px; }
-  .side h3 { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 14px 8px 6px; }
-  .side div { padding: 7px 8px; border-radius: 6px; color: var(--muted); }
-  .side div.on { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-
-  main { padding: 18px 20px 40px; max-width: 1000px; }
-  .titlerow { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-  h1 { font-size: 20px; margin: 0; }
-  .crumb { color: var(--muted); font-size: 13px; }
-  .switch { display: inline-flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; background: var(--panel); }
-  .switch button { border: 0; background: transparent; color: var(--ink); padding: 7px 12px; font: inherit; font-size: 13px; cursor: pointer; }
-  .switch button[aria-pressed="true"] { background: var(--accent); color: #fff; }
-  .proto { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
-
-  .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
-  @media (max-width: 600px) { .summary { grid-template-columns: 1fr; } }
-  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; }
-  .stat b { font-size: 22px; display: block; }
-  .stat span { color: var(--muted); font-size: 13px; }
-
-  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
-  @media (max-width: 700px) { .cards { grid-template-columns: 1fr; } }
-  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
-  .head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
-  .head h2 { font-size: 17px; margin: 0; }
-  .area { color: var(--muted); font-size: 13px; }
-  .tag { display: inline-block; font-size: 12px; padding: 2px 9px; border-radius: 999px; margin: 6px 0 6px; }
-  .tag.quiet { background: var(--warn-soft); color: var(--warn); }
-  .tag.busy { background: var(--accent-soft); color: var(--accent); }
-  .big { font-size: 28px; font-weight: 650; line-height: 1.1; }
-  .big small { font-size: 13px; font-weight: 400; color: var(--muted); }
-  .bars { display: flex; align-items: flex-end; gap: 4px; height: 52px; margin: 10px 0 2px; }
-  .bars span { flex: 1; background: var(--bar); border-radius: 3px 3px 0 0; min-height: 3px; }
-  .bars span.now { background: var(--bar-now); }
-  .axis { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 10px; }
-  .actions { display: flex; flex-wrap: wrap; gap: 8px; }
-  .btn { border: 1px solid var(--accent); background: transparent; color: var(--accent); padding: 7px 12px; border-radius: 8px; font: inherit; font-size: 14px; cursor: pointer; }
-  .btn:hover { background: var(--accent-soft); }
-  .btn[aria-expanded="true"] { background: var(--accent); color: #fff; }
-
-  .why { margin-top: 12px; border-left: 4px solid var(--warn); background: var(--warn-soft); padding: 12px 14px; border-radius: 0 10px 10px 0; }
-  .why p { margin: 0 0 6px; }
-  .why .added { border-top: 1px dashed var(--warn); margin-top: 8px; padding-top: 8px; }
-  .why .small { font-size: 12px; color: var(--muted); margin-top: 8px; }
-  .hint { color: var(--muted); font-size: 13px; margin: 8px 0 0; }
-
-  .replay { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; }
-  .replay input { flex: 1; min-width: 160px; accent-color: var(--accent); }
-  .rlabel { font-size: 13px; color: var(--muted); }
-  .tag.neutral { background: var(--ok-soft); color: var(--ok); }
-  .tag.watch { background: var(--accent-soft); color: var(--accent); }
-  .bars span { transition: height .25s; }
-  .bars span.future { opacity: .18; }
-  .bars span.sel { outline: 2px solid var(--ink); outline-offset: 1px; }
-  .note { margin-top: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; font-size: 14px; }
-  .note b { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: 4px; }
-
-  /* phone preview */
-  .overlay { position: fixed; inset: 0; background: rgba(10, 13, 20, .6); display: flex; align-items: center; justify-content: center; padding: 16px; }
-  .modal { background: var(--panel); border-radius: 16px; padding: 18px; max-width: 360px; width: 100%; }
-  .modal h3 { margin: 0 0 4px; font-size: 16px; }
-  .phone { margin: 12px auto 0; width: 250px; border: 8px solid #222834; border-radius: 30px; background: #0f131b; color: #eef1f7; min-height: 360px; padding: 18px 12px; }
-  .phone .time { text-align: center; font-size: 38px; font-weight: 300; margin: 10px 0 2px; }
-  .phone .date { text-align: center; color: #9aa3b5; font-size: 12px; margin-bottom: 20px; }
-  .notif, .msg { background: #232a38; border-radius: 13px; padding: 11px; font-size: 14px; width: 100%; text-align: left; color: inherit; border: 0; font-family: inherit; }
-  .notif { cursor: pointer; }
-  .notif:hover { background: #2c3445; }
-  .notif b { display: block; font-size: 12px; color: #9db3e8; }
-  .msg p { margin: 0 0 8px; }
-  .msg .added { border-top: 1px dashed #4a556d; margin-top: 8px; padding-top: 8px; }
-  .back { background: none; border: 0; color: #9db3e8; font: inherit; font-size: 14px; cursor: pointer; padding: 0 0 8px; }
-  .close { margin-top: 12px; width: 100%; }
+  #screens { margin-top: 0; border: 4px solid var(--line); border-radius: 6px; background: var(--panel); box-shadow: 0 0 0 4px #000; padding: 14px; }
+  #screens h2 { font: 12px/1.6 var(--pix); margin: 0 0 8px; color: var(--gold); }
+  .sbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 12px; font-size: 12px; }
+  .sbar input[type=range] { flex: 1; min-width: 140px; accent-color: var(--gold); }
+  .seg { display: inline-flex; border: 3px solid #000; }
+  .seg button { font: 8px/1.4 var(--pix); background: #334155; color: #fff; border: 0; padding: 9px 10px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--orange); }
+  .two { display: grid; grid-template-columns: 1.5fr 1fr; gap: 14px; align-items: start; }
+  @media (max-width: 760px) { .two { grid-template-columns: 1fr; } }
+  .paneh { font: 8px/1.5 var(--pix); color: var(--green); margin-bottom: 6px; }
+  .app { background: #f3f4f7; color: #1b2130; border: 3px solid #000; }
+  .apptop { background: #1b2130; color: #dfe4ee; font-size: 12px; padding: 7px 10px; display: flex; justify-content: space-between; }
+  .appbody { padding: 10px; }
+  .acards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 520px) { .acards { grid-template-columns: 1fr; } }
+  .acard { background: #fff; border: 1px solid #d5d9e2; border-radius: 8px; padding: 10px 12px; }
+  .acard h4 { margin: 0; font-size: 14px; display: flex; justify-content: space-between; }
+  .acard h4 span { font-weight: 400; color: #5f6879; font-size: 12px; }
+  .atag { display: inline-block; font-size: 11px; padding: 1px 8px; border-radius: 999px; background: #fdf0e3; color: #a8480a; margin: 5px 0; }
+  .abig { font-size: 22px; font-weight: 700; line-height: 1.1; margin-top: 4px; }
+  .abig small { font-size: 11px; font-weight: 400; color: #5f6879; }
+  .abars { display: flex; align-items: flex-end; gap: 3px; height: 44px; margin: 8px 0 2px; }
+  .abars span { flex: 1; background: #9db3e8; border-radius: 2px 2px 0 0; min-height: 3px; }
+  .abars span.now { background: #d9822b; }
+  .abars span.future { opacity: .18; }
+  .abars span.sel { outline: 2px solid #1b2130; outline-offset: 1px; }
+  .aaxis { display: flex; justify-content: space-between; font-size: 10px; color: #5f6879; }
+  .anote { margin-top: 8px; border-left: 4px solid #a8480a; background: #fdf0e3; padding: 8px 10px; font-size: 12px; border-radius: 0 8px 8px 0; }
+  .anone { margin-top: 8px; font-size: 12px; color: #6b7385; font-style: italic; }
+  .bubble { margin-top: 10px; background: #0a0d22; border: 2px solid var(--gold); color: var(--ink); padding: 8px 10px; font-size: 12px; }
+  .bubble.ok { border-color: var(--green); }
+  .pphone { margin: 0 auto; width: 232px; border: 8px solid #222834; border-radius: 28px; background: #0f131b; color: #eef1f7; min-height: 360px; padding: 14px 12px; }
+  .ptime { text-align: center; font-size: 34px; font-weight: 300; margin: 10px 0 16px; }
+  .pnotif, .pmsg { background: #232a38; border-radius: 12px; padding: 10px; font-size: 13px; width: 100%; text-align: left; color: inherit; border: 0; font-family: inherit; display: block; margin-bottom: 8px; }
+  .pnotif { cursor: pointer; }
+  .pnotif:hover { background: #2c3445; }
+  .pnotif b, .pmsg b { display: block; font-size: 11px; color: #9db3e8; margin-bottom: 2px; }
+  .pmsg.me { background: #1d4ed8; margin-left: 28px; }
+  .pmsg.kip { margin-right: 28px; }
+  .pempty { text-align: center; color: #6b7385; font-size: 12px; margin-top: 70px; }
+  .pbtn { font: 8px/1.4 var(--pix); background: #334155; color: #fff; border: 3px solid #000; padding: 8px 10px; cursor: pointer; margin: 8px auto 0; display: block; }
+  .scap { font-size: 13px; line-height: 1.55; margin: 12px 0 0; }
+  .scap small { color: #9aa3b5; display: block; margin-top: 4px; }
+  .foot { margin-top: 14px; font-size: 12px; color: #b9bfdc; line-height: 1.5; }
 </style>
 </head>
 <body>
-  <nav class="topnav">
-    <span class="logo">ROOK · Dispatch</span>
-    <a href="#" class="on">Coverage</a><a href="#">Callouts</a><a href="#">Responders</a><a href="#">Reports</a>
-    <span class="who">Kip · Handler</span>
-  </nav>
+<div class="wrap">
+  <h1>ROOK QUEST 4.2: The Quiet Responder</h1>
+  <p class="sub">A prototype for Helen Achebe. It is a game that explains what we found and what we propose. The numbers on the clear screens come from the callout history. The game itself is an illustration, not Rook's real ranking.</p>
 
-  <div class="layout">
-    <aside class="side">
-      <h3>My responders</h3>
-      <div class="on">Coverage</div>
-      <div>Meteor Mite</div>
-      <div>The Gale</div>
-      <h3>Console</h3>
-      <div>Filters</div>
-      <div>Settings</div>
-    </aside>
-
-    <main>
-      <div class="titlerow">
-        <div>
-          <h1>Coverage</h1>
-          <div class="crumb">Your responders · week of <span id="crumbweek">31 Aug</span></div>
-        </div>
-      </div>
-      <div class="proto">Prototype for Helen Achebe. Wording is from brief.md and the numbers are from the callout history. Nothing here is built or shipped.</div>
-
-      <div class="replay">
-        <button class="btn" id="play">&#9654; Replay Meteor Mite</button>
-        <label for="week" class="rlabel">Week of <b id="weeklabel">31 Aug</b></label>
-        <input type="range" id="week" min="0" max="9" value="9" aria-label="Week to show">
-        <span class="rlabel" id="weekmark"></span>
-      </div>
-
-      <div class="summary">
-        <div class="stat"><b>2</b><span>responders on your desk</span></div>
-        <div class="stat"><b id="stat2">22</b><span>pings this week across both</span></div>
-        <div class="stat"><b id="stat3">1</b><span>responder gone quiet</span></div>
-      </div>
-
-      <div class="cards">
-        <section class="card" aria-label="Meteor Mite">
-          <div class="head"><h2>Meteor Mite</h2><span class="area">Eastgate</span></div>
-          <span class="tag" id="mmtag"></span>
-          <div class="big"><span id="mmbig"></span> <small id="mmsmall"></small></div>
-          <div class="bars" id="mmbars" aria-label="Pings per week for Meteor Mite"></div>
-          <div class="axis"><span>29 Jun</span><span>12 Aug</span><span>31 Aug</span></div>
-          <div class="actions">
-            <button class="btn" id="why" aria-expanded="false" aria-controls="whybox">Why is this?</button>
-            <button class="btn" id="preview">What Meteor Mite sees</button>
-          </div>
-          <div class="why hidden" id="whybox">
-            <p><b>Quiet since 12 Aug.</b> Pings a week: 11 before, <span id="nownum">1</span> now. The ping wait was cut from 90 to 60 seconds that day. We are checking if that is why. Meteor Mite is still on the list.</p>
-            <p class="added" id="added1">Misses now count less against ranking.</p>
-            <div class="small">We have not proven the cause yet.</div>
-          </div>
-        </section>
-
-        <section class="card" aria-label="The Gale">
-          <div class="head"><h2>The Gale</h2><span class="area">Eastgate</span></div>
-          <span class="tag busy" id="gtag"></span>
-          <div class="big"><span id="gbig"></span> <small id="gsmall"></small></div>
-          <div class="bars" id="gbars" aria-label="Pings per week for The Gale"></div>
-          <div class="axis"><span>29 Jun</span><span>12 Aug</span><span>31 Aug</span></div>
-          <p class="hint" style="margin:0" id="ghint"></p>
-        </section>
-      </div>
-
-      <div class="note"><b>The proposal in one line</b>Tell Kip and Meteor Mite what is happening, and change how a miss is scored so Meteor Mite has a real way back. The recovery rule is in <code>history.py</code>: a miss costs half as much as a "no", and scores drift back toward neutral. Wen Li and Marcus Oyelaran set the size and the time.</div>
-      <div class="note"><b>Who may lose pings</b>The Gale and the busiest responders.</div>
-      <div class="note"><b>Needs sign-off from</b>Wen Li and Marcus Oyelaran (the rule, and whether the phone can show a message). Rook Supply to confirm the availability record is untouched. Sofia Marino for the screens.</div>
-    </main>
+  <div id="frame">
+    <canvas id="c" width="480" height="270" aria-label="Game screen"></canvas>
+    <div id="ui"></div>
   </div>
 
-  <div class="overlay hidden" id="overlay">
-    <div class="modal" role="dialog" aria-label="What Meteor Mite sees on their phone">
-      <h3>What Meteor Mite sees</h3>
-      <div class="hint" style="margin:0">Mock of the phone message. We do not know yet if the phone can show it.</div>
-      <div class="phone">
-        <div id="lock">
-          <div class="time">9:41</div>
-          <div class="date">Lock screen</div>
-          <button class="notif" id="notif"><b>Rook Dispatch</b>We see you are getting fewer pings since 12 Aug. Tap to read.</button>
-        </div>
-        <div id="read" class="hidden">
-          <button class="back" id="back">‹ Back</button>
-          <div class="msg">
-            <p>We see you are getting fewer pings since 12 Aug. We are checking why. You are still on the list.</p>
-            <p class="added" id="added2">Missed pings now count less against your place, and it recovers over time.</p>
-          </div>
-        </div>
+  <section id="screens" class="hidden" aria-label="What Kip and Meteor Mite see">
+    <h2>WARP ZONE: WHAT KIP AND METEOR MITE SEE</h2>
+    <div class="sbar">
+      <div class="seg" id="mode" role="group" aria-label="Which version to show">
+        <button data-m="today" aria-pressed="true">TODAY, AFTER 4.2</button>
+        <button data-m="fix" aria-pressed="false">WITH OUR FIX</button>
       </div>
-      <button class="btn close" id="close">Close</button>
+      <label for="sslider">Week of <b id="sweek">31 Aug</b></label>
+      <input type="range" id="sslider" min="0" max="9" value="9" aria-label="Week to show">
+      <button class="btn alt" id="splay">&#9654; REPLAY</button>
     </div>
+    <div class="two">
+      <div><div class="paneh">KIP'S CONSOLE</div><div id="sconsole"></div></div>
+      <div><div class="paneh">METEOR MITE'S PHONE</div><div id="sphone"></div></div>
+    </div>
+    <p class="scap" id="scap"></p>
+    <div class="btns"><button class="btn" id="snext">CONTINUE</button></div>
+  </section>
+
+  <div id="pad">
+    <button class="btn" id="left" aria-label="Move left">&#9664;</button>
+    <button class="btn" id="right" aria-label="Move right">&#9654;</button>
+    <button class="btn alt" id="skip">Skip round</button>
+    <button class="btn alt" id="mute">Sound: on</button>
+    <span class="hint">Move with the arrow keys, A and D, the buttons, or by pointing at the screen.</span>
   </div>
+  <p class="foot">Meteor Mite is the worked example. The same plan covers the other three quiet responders: Farlight, The Undertow and Vesper.</p>
+</div>
 
 <script>
-  var idx = 9, noteOpen = false, timer = null;
-  var WEEKS = ["29 Jun","6 Jul","13 Jul","20 Jul","27 Jul","3 Aug","10 Aug","17 Aug","24 Aug","31 Aug"];
-  // Pings per week and pings taken, from the callout history. The 10 Aug week shows only its days after 12 Aug.
+(function () {
+  var cv = document.getElementById('c'), ctx = cv.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  var W = 480, H = 270, GY = 222;
+  var FONT = "'Press Start 2P','Courier New',monospace";
+  var ui = document.getElementById('ui');
+
+  var WORLDS = [
+    { id: '1-1', title: 'BEFORE 4.2', wait: 90, fall: 5.2, cost: 0.12, drift: 0 },
+    { id: '1-2', title: 'AFTER 4.2', wait: 60, fall: 0.8, cost: 0.12, drift: 0 },
+    { id: '1-3', title: 'THE FIX', wait: 60, fall: 0.8, cost: 0.06, drift: 0.03 }
+  ];
+  var screen = 'title', wi = 0, g = null, results = [], muted = false, ac = null, last = 0, clouds = [], cloudX = 0;
+  for (var i = 0; i < 5; i++) clouds.push({ x: i * 110 + 20, y: 30 + (i % 3) * 28 });
+
+  function $(id) { return document.getElementById(id); }
+  function pad3(n) { return ('00' + n).slice(-3); }
+
+  /* sound: tiny square-wave beeps, only after the first click */
+  function beep(f, d, t) {
+    if (muted) return;
+    try {
+      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      var o = ac.createOscillator(), gn = ac.createGain();
+      o.type = t || 'square'; o.frequency.value = f; gn.gain.value = 0.04;
+      o.connect(gn); gn.connect(ac.destination); o.start(); o.stop(ac.currentTime + d);
+    } catch (e) {}
+  }
+
+  /* pixel sprites */
+  var PAL = { o: '#c2410c', y: '#fbbf24', w: '#ffffff', k: '#1b1b1b', r: '#dc2626' };
+  var MITE = [
+    '..oooooo..',
+    '.oyyyyyyo.',
+    'oyyyyyyyyo',
+    'oywkyywkyo',
+    'oyyyyyyyyo',
+    'oyyrrrryyo',
+    '.oyyyyyyo.',
+    '..oooooo..',
+    '.kk....kk.'
+  ];
+  function sprite(map, x, y, s) {
+    for (var r = 0; r < map.length; r++) for (var c = 0; c < map[r].length; c++) {
+      var ch = map[r][c]; if (ch === '.') continue;
+      ctx.fillStyle = PAL[ch]; ctx.fillRect(Math.round(x + c * s), Math.round(y + r * s), s, s);
+    }
+  }
+  function text(str, x, y, size, color, align) {
+    ctx.font = 'bold ' + size + 'px ' + FONT; ctx.textAlign = align || 'left'; ctx.textBaseline = 'top';
+    ctx.fillStyle = '#000'; ctx.fillText(str, x + 1, y + 1);
+    ctx.fillStyle = color || '#fff'; ctx.fillText(str, x, y);
+  }
+
+  /* scene */
+  function drawScene(t) {
+    ctx.fillStyle = '#6b8cff'; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#fff';
+    clouds.forEach(function (c) {
+      var x = ((c.x - cloudX) % (W + 80) + (W + 80)) % (W + 80) - 40, y = c.y;
+      ctx.fillRect(x, y + 6, 44, 10); ctx.fillRect(x + 8, y, 28, 8); ctx.fillRect(x + 4, y + 14, 36, 4);
+      ctx.fillStyle = '#c7d7ff'; ctx.fillRect(x + 4, y + 16, 36, 2); ctx.fillStyle = '#fff';
+    });
+    [[60, 90, 38], [330, 120, 44], [440, 70, 30]].forEach(function (h) {
+      ctx.fillStyle = '#2f9e44';
+      for (var dx = -h[1] / 2; dx < h[1] / 2; dx += 4) {
+        var ht = Math.round(h[2] * Math.sqrt(1 - Math.pow(dx / (h[1] / 2), 2)));
+        ctx.fillRect(h[0] + dx, GY - ht, 4, ht);
+      }
+    });
+    ctx.fillStyle = '#c2410c'; ctx.fillRect(0, GY, W, H - GY);
+    ctx.fillStyle = '#7c2d12';
+    for (var y = GY; y < H; y += 16) {
+      ctx.fillRect(0, y, W, 2);
+      for (var x = ((y - GY) / 16 % 2) * 16; x < W; x += 32) ctx.fillRect(x, y, 2, 16);
+    }
+    ctx.fillStyle = '#fb923c'; ctx.fillRect(0, GY, W, 2);
+  }
+
+  function drawHud() {
+    var w = WORLDS[wi];
+    text('METEOR MITE', 16, 10, 8, '#fff');
+    text(pad3(g ? g.taken : 0), 16, 22, 8, '#fff');
+    text('MISSED', 150, 10, 8, '#fff');
+    text('x' + ('0' + (g ? g.missed : 0)).slice(-2), 150, 22, 8, '#fca5a5');
+    text('WORLD', 270, 10, 8, '#fff');
+    text(w.id, 270, 22, 8, '#fff');
+    text('TIME', 390, 10, 8, '#fff');
+    text(pad3(g ? Math.max(0, Math.ceil(g.dur - g.t)) : 0), 390, 22, 8, '#fff');
+    text('PLACE IN LINE', 16, 40, 7, '#fde68a');
+    ctx.fillStyle = '#000'; ctx.fillRect(112, 38, 124, 12);
+    var s = g ? g.score : 0.7;
+    ctx.fillStyle = s > 0.5 ? '#4ade80' : s > 0.25 ? '#fbbf24' : '#ef4444';
+    ctx.fillRect(114, 40, Math.round(120 * s), 8);
+    if (wi === 2) { ctx.fillStyle = '#fff'; ctx.fillRect(114 + 60, 36, 2, 16); text('NEUTRAL', 174, 52, 6, '#fff', 'center'); }
+  }
+
+  function drawPing(p) {
+    ctx.fillStyle = '#7c2d12'; ctx.fillRect(p.x - 8, p.y, 16, 16);
+    ctx.fillStyle = '#f59e0b'; ctx.fillRect(p.x - 6, p.y + 2, 12, 12);
+    ctx.fillStyle = '#fde68a'; ctx.fillRect(p.x - 6, p.y + 2, 12, 2); ctx.fillRect(p.x - 6, p.y + 2, 2, 12);
+    text('?', p.x, p.y + 4, 9, '#fff', 'center');
+  }
+
+  function render() {
+    drawScene();
+    if (screen === 'play' && g) {
+      g.pings.forEach(drawPing);
+      g.pops.forEach(function (p) { text(p.t, p.x, p.y, 8, p.c, 'center'); });
+      sprite(MITE, g.x - 10, GY - 18, 2);
+      if (g.score < 0.3) text('...phone is quiet...', g.x, GY - 40, 7, '#fff', 'center');
+    } else {
+      sprite(MITE, W / 2 - 10 + (screen === 'title' ? 0 : 0), GY - 18, 2);
+    }
+    drawHud();
+  }
+
+  /* game loop */
+  function startRound(i) {
+    wi = i;
+    var s0 = i === 2 ? (results[1] ? results[1].end : 0.15) : 0.7;
+    g = { x: W / 2, score: s0, taken: 0, missed: 0, offered: 0, t: 0, spawnT: 0.4, pings: [], pops: [], target: null, keys: {}, dur: 24, stopAt: 20 };
+    screen = 'play'; ui.classList.add('hidden');
+  }
+  function step(dt) {
+    cloudX += 6 * dt;
+    if (screen !== 'play' || !g) return;
+    var w = WORLDS[wi], dir = 0;
+    g.t += dt;
+    if (g.keys.left) dir -= 1;
+    if (g.keys.right) dir += 1;
+    if (dir) { g.x += dir * 200 * dt; g.target = null; }
+    else if (g.target != null) { var d = g.target - g.x; if (Math.abs(d) > 2) g.x += (d > 0 ? 1 : -1) * Math.min(Math.abs(d), 200 * dt); }
+    g.x = Math.max(14, Math.min(W - 14, g.x));
+    if (w.drift) {
+      if (g.score < 0.5) g.score = Math.min(0.5, g.score + w.drift * dt);
+      else if (g.score > 0.5) g.score = Math.max(0.5, g.score - w.drift * dt);
+    }
+    if (g.t < g.stopAt) {
+      g.spawnT -= dt;
+      if (g.spawnT <= 0) {
+        g.pings.push({ x: 24 + Math.random() * (W - 48), y: -16 }); g.offered++;
+        g.spawnT = (1.05 + Math.random() * 0.3) / Math.max(g.score, 0.12);
+      }
+    }
+    var v = (GY + 16) / w.fall;
+    g.pings = g.pings.filter(function (p) {
+      p.y += v * dt;
+      var bottom = p.y + 16;
+      if (bottom >= GY - 20 && p.y < GY && Math.abs(p.x - g.x) < 18) {
+        g.taken++; g.score = Math.min(1, g.score + 0.08); g.pops.push({ x: p.x, y: p.y - 6, t: '+1', c: '#4ade80', l: 0.7 }); beep(880, 0.08); return false;
+      }
+      if (bottom >= GY) {
+        g.missed++; g.score = Math.max(0, g.score - w.cost); g.pops.push({ x: p.x, y: GY - 22, t: 'MISS', c: '#fca5a5', l: 0.9 }); beep(160, 0.18, 'sawtooth'); return false;
+      }
+      return true;
+    });
+    g.pops = g.pops.filter(function (p) { p.l -= dt; p.y -= 12 * dt; return p.l > 0; });
+    if (g.t >= g.dur) endRound();
+  }
+  function endRound() {
+    results[wi] = { offered: g.offered, taken: g.taken, missed: g.missed, end: g.score, skipped: !!g.skipped };
+    screen = 'clear'; showClear(wi); beep(660, 0.15); setTimeout(function () { beep(990, 0.2); }, 150);
+  }
+  function frame(ts) {
+    var dt = Math.min(0.05, (ts - last) / 1000 || 0); last = ts;
+    step(dt); render(); requestAnimationFrame(frame);
+  }
+
+  /* cards */
+  function card(html, buttons) {
+    ui.innerHTML = '<div class="card">' + html + '<div class="btns">' +
+      buttons.map(function (b, i) { return '<button class="btn' + (b.alt ? ' alt' : '') + '" data-i="' + i + '">' + b.label + '</button>'; }).join('') + '</div></div>';
+    ui.classList.remove('hidden');
+    Array.prototype.forEach.call(ui.querySelectorAll('.btns .btn'), function (el) { el.onclick = buttons[+el.dataset.i].fn; });
+    Array.prototype.forEach.call(ui.querySelectorAll('.qb'), function (el) {
+      el.onclick = function () {
+        el.classList.add('bump'); beep(1040, 0.1);
+        var f = el.parentNode.querySelector('.fact'); f.classList.remove('off'); f.textContent = el.dataset.t;
+        el.textContent = '!'; el.style.background = '#a16207'; el.onclick = null;
+      };
+    });
+    var first = ui.querySelector('.btns .btn'); if (first) first.focus({ preventScroll: true });
+  }
+  function qb(hidden, shown) { return '<div class="qrow"><button class="qb" data-t="' + shown.replace(/"/g, '&quot;') + '" aria-label="Hit the block">?</button><span class="fact off">' + hidden + '</span></div>'; }
+
+  function showTitle() {
+    screen = 'title'; g = null; wi = 0;
+    card('<h2>ROOK QUEST 4.2</h2>' +
+      '<p><b>Meteor Mite</b> used to get about 11 pings a week. Since release 4.2 on 12 Aug, about 1. Their handler Kip has nothing true to say about it.</p>' +
+      '<p>Play three short worlds to see why a responder goes quiet, then warp into the screens Kip and Meteor Mite see, and see what we propose. Catch the ? pings before they hit the ground.</p>' +
+      '<h3>HIT A BLOCK</h3>' + qb('Hit the block to see what the game cannot show you.', 'The game is an illustration. We have not proven why the four responders stopped answering. The real cause could be a phone or alert problem.'),
+      [{ label: 'PRESS START', fn: function () { showIntro(0); } }]);
+  }
+  function showIntro(i) {
+    screen = 'intro'; wi = i; var w = WORLDS[i];
+    var rules = i === 0
+      ? '<p>The ping wait is <b>90 seconds</b>, so there is time to answer. In the game, each ping you take lifts your place in line (+0.08) and each miss lowers it (-0.12). A lower place means fewer pings come.</p>'
+      : i === 1
+      ? '<p>12 Aug: the ping wait is cut to <b>60 seconds</b>. The pings fall faster. Same rules: +0.08 for a take, -0.12 for a miss, and a lower place means fewer pings.</p>'
+      : '<p>The proposal: the same 60 seconds, but a miss costs <b>half as much</b> (-0.06) and your place <b>drifts back toward neutral</b> over time.</p>' +
+        '<div class="say"><b>WHAT KIP WOULD SEE ON METEOR MITE\'S CARD</b>Quiet since 12 Aug. Pings a week: 11 before, 1 now. The ping wait was cut from 90 to 60 seconds that day. We are checking if that is why. Meteor Mite is still on the list. Misses now count less against ranking.</div>' +
+        '<div class="say"><b>WHAT METEOR MITE WOULD SEE ON THEIR PHONE</b>We see you are getting fewer pings since 12 Aug. We are checking why. You are still on the list. Missed pings now count less against your place, and it recovers over time.</div>' +
+        '<p>You start where World 1-2 left you.</p>';
+    card('<h2>WORLD ' + w.id + ': ' + w.title + '</h2>' + rules + '<p>Move: arrow keys, A and D, the on-screen buttons, or point at the screen.</p>',
+      [{ label: 'START', fn: function () { startRound(i); } }]);
+  }
+  function showClear(i) {
+    var r = results[i], pct = Math.round(r.end * 100);
+    var played = '<p><b>You' + (r.skipped ? ' (round skipped early)' : '') + ':</b> offered ' + r.offered + (r.offered === 1 ? ' ping' : ' pings') + ', took ' + r.taken + ', missed ' + r.missed + '. Place in line: ' + pct + '%.</p>';
+    var html, loop = '<p>In the game, every miss lowers your place in line, and a lower place means fewer pings.</p>';
+    if (i === 0) {
+      html = '<h2>WORLD 1-1 CLEAR: BEFORE 4.2</h2>' + played +
+        '<h3>WHAT THE DATA SAYS</h3><ul><li>Meteor Mite got 10 to 12 pings a week.</li><li>The four who later went quiet missed 1 to 4% of their pings.</li><li>Acceptance held at 75 to 78% for six weeks.</li></ul>' +
+        qb('Hit the block: tickets about quiet responders.', 'Before 12 Aug there were 0 tickets about quiet responders.');
+    } else if (i === 1) {
+      html = '<h2>WORLD 1-2 CLEAR: AFTER 4.2</h2>' + played + loop +
+        '<h3>WHAT THE DATA SAYS</h3><ul><li>12 Aug: ping wait cut from 90 to 60 seconds.</li><li>Meteor Mite pings a week: 7 (part week), then 4, 2, 1.</li><li>The four quiet responders now miss 53 to 64% of pings (1 to 4% before).</li><li>Tickets about quiet responders: 0 before, 30 after.</li><li>The Gale, on the same desk, went from about 13 to 21 pings a week.</li></ul>' +
+        qb('Hit the block: what Kip says.', 'Kip, 4 Sep: all he can say to Meteor Mite is "hang in there," and "I don\'t have anything better than that."') +
+        qb('Hit the block: what we have not proven.', 'The 60 second wait likely started the misses, and the code never forgives a miss. This is not proven yet.');
+    } else {
+      html = '<h2>WORLD 1-3 CLEAR: THE FIX</h2>' + played +
+        '<p>In the game, misses cost half as much and your place drifts back, so pings keep coming.</p>' +
+        '<h3>THE PROPOSAL</h3><ul><li>Words for Kip and for Meteor Mite, so neither is left guessing.</li><li>A recovery rule in <b>history.py</b>: a miss costs half as much as a "no", and scores drift toward neutral. Wen Li and Marcus Oyelaran set the size and the time.</li><li>Try it on the four quiet responders for four weeks, against the other 12.</li><li>Roll back if callouts nobody took stay above 11.1% two weeks in a row.</li></ul>' +
+        qb('Hit the block: who may lose pings.', 'The Gale and the busiest responders may lose pings.') +
+        qb('Hit the block: what we do not know yet.', 'Can the phone show a message? Marcus Oyelaran has to confirm. Rook Supply has not been asked about the availability record.');
+    }
+    card(html, [i === 0 ? { label: 'NEXT WORLD', fn: function () { showIntro(1); } } : i === 1 ? { label: 'WARP: WHAT THEY SEE TODAY', fn: function () { showScreens('today', function () { showIntro(2); }); } } : { label: 'WARP: WHAT THEY WOULD SEE WITH THE FIX', fn: function () { showScreens('fix', showFinal); } },
+                { label: 'PLAY THIS WORLD AGAIN', alt: true, fn: function () { startRound(i); } }]);
+  }
+  function showFinal() {
+    screen = 'final';
+    card('<h2>COURSE CLEAR</h2><p>Helen, these three blocks are yours.</p>' +
+      qb('Go ahead with this plan, to take to engineering?', 'My suggestion: yes.') +
+      qb('Try it on the four quiet responders first, once engineering says it is safe?', 'My suggestion: yes, with the stop rule.') +
+      qb('Does this replace a Q3 commitment?', 'Please tell me. The Q3 list is not agreed yet.') +
+      '<h3>HOW WE WILL KNOW IT WORKED (WEEK 4)</h3><ul><li>Each of the four gets 8 or more pings a week (today 3 to 4; Meteor Mite 1).</li><li>25% or less of their pings missed (today 53 to 64%).</li><li>2 or fewer "gone quiet" tickets a week.</li><li>The Gale, overall acceptance and callouts nobody took must not get worse.</li></ul>' +
+      '<h3>STILL OPEN</h3><ul><li>Why the ping wait was cut, ranking scores over time: Marcus Oyelaran.</li><li>Size and time of the recovery rule: Wen Li and Marcus Oyelaran.</li><li>Numbers after 6 Sep: Ravi Menon.</li></ul>',
+      [{ label: 'PLAY AGAIN', fn: function () { results = []; showTitle(); } }]);
+  }
+
+  /* warp zone: the screens Kip and Meteor Mite would see */
+  var WEEKS = ['29 Jun','6 Jul','13 Jul','20 Jul','27 Jul','3 Aug','10 Aug','17 Aug','24 Aug','31 Aug'];
   var MM = { p: [11,12,10,11,12,11,7,4,2,1], t: [7,9,6,7,9,8,2,1,0,0] };
   var GALE = [13,12,13,14,13,13,11,17,20,21];
-  function $(id) { return document.getElementById(id); }
-  function bars(el, vals, max) {
-    el.innerHTML = "";
-    vals.forEach(function (v, i) {
-      var b = document.createElement("span");
-      b.style.height = Math.max(8, Math.round(v / max * 100)) + "%";
-      if (i >= 6) b.className = "now";
-      if (i > idx) b.className += " future";
-      if (i === idx) b.className += " sel";
-      b.title = "Week of " + WEEKS[i] + ": " + v + " pings";
-      el.appendChild(b);
-    });
+  var sIdx = 9, sMode = 'today', sNext = null, sTimer = null, sThread = false, sOpen = false;
+  function barsHtml(vals, max) {
+    return vals.map(function (v, i) {
+      return '<span class="' + (i >= 6 ? 'now' : '') + (i > sIdx ? ' future' : '') + (i === sIdx ? ' sel' : '') + '" style="height:' + Math.max(8, Math.round(v / max * 100)) + '%" title="Week of ' + WEEKS[i] + ': ' + v + ' pings"></span>';
+    }).join('');
   }
-  function render() {
-    var quiet = idx >= 7, release = idx === 6;
-    var p = MM.p[idx], t = MM.t[idx];
-    $("weeklabel").textContent = WEEKS[idx];
-    $("crumbweek").textContent = WEEKS[idx];
-    $("weekmark").textContent = release ? "4.2 shipped Wed 12 Aug" : (idx > 6 ? "After 4.2" : "Before 4.2");
-    // Meteor Mite
-    var tag = $("mmtag");
-    tag.className = "tag " + (quiet ? "quiet" : release ? "watch" : "neutral");
-    tag.textContent = quiet ? "Quiet since 12 Aug" : release ? "4.2 shipped 12 Aug" : "Normal week";
-    $("mmbig").textContent = p;
-    $("mmsmall").textContent = (p === 1 ? "ping" : "pings") + " this week · " + t + " taken" + (idx >= 6 ? " · 11 a week before" : "");
-    bars($("mmbars"), MM.p, 12);
-    var open = quiet && noteOpen;
-    $("whybox").classList.toggle("hidden", !open);
-    $("why").setAttribute("aria-expanded", String(open));
-    $("why").disabled = !quiet;
-    $("why").style.opacity = quiet ? "1" : ".45";
-    // Gale
-    var g = GALE[idx];
-    $("gtag").textContent = idx >= 7 ? "Busier than before" : "Normal week";
-    $("gtag").className = "tag " + (idx >= 7 ? "busy" : "neutral");
-    $("gbig").textContent = g;
-    $("gsmall").textContent = "pings this week" + (idx >= 7 ? " · 13 a week before" : "");
-    bars($("gbars"), GALE, 21);
-    $("nownum").textContent = p;
-    $("ghint").textContent = quiet ? "Same area, same week. The two cards are the story Kip could not explain." : "Same area, steady weeks for both responders.";
-    // summary
-    $("stat2").textContent = p + g;
-    $("stat3").textContent = quiet ? 1 : 0;
-    $("week").value = idx;
+  function plural(n) { return n === 1 ? 'ping' : 'pings'; }
+  function renderScreens() {
+    var quiet = sIdx >= 7, fix = sMode === 'fix', p = MM.p[sIdx], t = MM.t[sIdx], gl = GALE[sIdx];
+    $('sweek').textContent = WEEKS[sIdx];
+    $('sslider').value = sIdx;
+    Array.prototype.forEach.call(document.querySelectorAll('#mode button'), function (b) { b.setAttribute('aria-pressed', String(b.dataset.m === sMode)); });
+    var mmCard = '<div class="acard"><h4>Meteor Mite <span>Eastgate</span></h4>' +
+      (quiet && fix ? '<span class="atag">Quiet since 12 Aug</span>' : '') +
+      '<div class="abig">' + p + ' <small>' + plural(p) + ' this week · ' + t + ' taken' + (sIdx >= 6 ? ' · 11 a week before' : '') + '</small></div>' +
+      '<div class="abars">' + barsHtml(MM.p, 12) + '</div><div class="aaxis"><span>29 Jun</span><span>12 Aug</span><span>31 Aug</span></div>' +
+      (quiet && fix ? '<div class="anote"><b>Quiet since 12 Aug.</b> Pings a week: 11 before, ' + p + ' now. The ping wait was cut from 90 to 60 seconds that day. We are checking if that is why. Meteor Mite is still on the list. Misses now count less against ranking.</div>' : '') +
+      (quiet && !fix ? '<div class="anone">Nothing on the card says why.</div>' : '') + '</div>';
+    var gCard = '<div class="acard"><h4>The Gale <span>Eastgate</span></h4>' +
+      '<div class="abig">' + gl + ' <small>pings this week' + (sIdx >= 7 ? ' · 13 a week before' : '') + '</small></div>' +
+      '<div class="abars">' + barsHtml(GALE, 21) + '</div><div class="aaxis"><span>29 Jun</span><span>12 Aug</span><span>31 Aug</span></div></div>';
+    var bubble = quiet ? (fix
+      ? '<div class="bubble ok">Intent: Kip can tell Meteor Mite what is true. Still on the list, and we are checking why.</div>'
+      : '<div class="bubble">Kip, 4 Sep: two cards on one screen "might as well be two different products." All he can say is "hang in there," and "I don\'t have anything better than that."</div>') : '';
+    $('sconsole').innerHTML = '<div class="app"><div class="apptop"><span>ROOK &middot; Dispatch &middot; Coverage</span><span>Kip &middot; Handler</span></div><div class="appbody"><div class="acards">' + mmCard + gCard + '</div></div></div>' + bubble;
+
+    var ph = '<div class="pphone"><div class="ptime">9:41</div>';
+    if (sIdx <= 5) ph += '<div class="pnotif" style="cursor:default"><b>Rook Dispatch</b>New callout ping. You have 90 seconds to answer.</div>';
+    else if (sIdx === 6) ph += '<div class="pnotif" style="cursor:default"><b>Rook Dispatch</b>New callout ping. You have 60 seconds to answer.</div>';
+    else if (fix) {
+      ph += sOpen
+        ? '<button class="pbtn" data-a="back" style="margin:0 0 8px">&lsaquo; BACK</button><div class="pmsg"><b>Rook Dispatch</b>We see you are getting fewer pings since 12 Aug. We are checking why. You are still on the list. Missed pings now count less against your place, and it recovers over time.</div>'
+        : '<button class="pnotif" data-a="open"><b>Rook Dispatch</b>We see you are getting fewer pings since 12 Aug. Tap to read.</button>';
+    } else if (sThread) {
+      ph += '<button class="pbtn" data-a="back" style="margin:0 0 8px">&lsaquo; BACK</button><div class="pmsg me"><b>Meteor Mite</b>Is something broken? It is so quiet.</div><div class="pmsg kip"><b>Kip</b>Hang in there, it\'ll pick up.</div>';
+    } else {
+      ph += '<div class="pempty">No pings.<br>No message from Rook.</div>';
+    }
+    ph += '</div>';
+    if (quiet && !fix && !sThread) ph += '<button class="pbtn" data-a="thread">TEXT KIP</button>';
+    $('sphone').innerHTML = ph;
+
+    var cap;
+    if (sIdx <= 5) cap = 'Before 4.2. Meteor Mite gets 10 to 12 pings a week and Kip\'s two cards look alike.';
+    else if (sIdx === 6) cap = '12 Aug: 4.2 ships. The ping wait drops from 90 to 60 seconds. This week shows only the days after the release.';
+    else if (!fix) cap = 'After 4.2, today. Meteor Mite gets ' + p + ' ' + plural(p) + ' this week. Kip sees two cards that tell different stories and nothing that says why. Meteor Mite sees a silent phone and texts Kip.<small>Mock based on Kip\'s 4 Sep description and the callout history. The real console and phone may look different. The text message wording is paraphrased.</small>';
+    else cap = 'With our fix. Kip\'s card says what happened and Meteor Mite is told the same thing, so neither is left guessing.<small>Wording is proposed, not live. The phone message needs engineering to confirm it can be shown.</small>';
+    $('scap').innerHTML = cap;
   }
-  function stop() { if (timer) { clearInterval(timer); timer = null; $("play").innerHTML = "&#9654; Replay Meteor Mite"; } }
-  $("week").oninput = function () { stop(); idx = +this.value; if (idx >= 7) noteOpen = true; render(); };
-  $("play").onclick = function () {
-    if (timer) { stop(); return; }
-    idx = 0; noteOpen = false; render();
-    $("play").innerHTML = "&#10074;&#10074; Pause";
-    timer = setInterval(function () {
-      if (idx >= 9) { stop(); return; }
-      idx += 1;
-      if (idx === 7) noteOpen = true;
-      render();
-    }, 1100);
+  function showScreens(mode, next) {
+    screen = 'screens'; sMode = mode; sNext = next; sIdx = 9; sThread = false; sOpen = false;
+    $('frame').classList.add('hidden'); $('pad').classList.add('hidden'); $('screens').classList.remove('hidden');
+    renderScreens(); $('screens').scrollIntoView({ block: 'start' });
+  }
+  function leaveScreens() {
+    if (sTimer) { clearInterval(sTimer); sTimer = null; }
+    $('screens').classList.add('hidden'); $('frame').classList.remove('hidden'); $('pad').classList.remove('hidden');
+    var n = sNext; sNext = null; if (n) n();
+  }
+  $('snext').onclick = leaveScreens;
+  $('sslider').oninput = function () { if (sTimer) { clearInterval(sTimer); sTimer = null; } sIdx = +this.value; sThread = false; sOpen = false; renderScreens(); };
+  $('mode').onclick = function (e) { var b = e.target.closest('button'); if (!b) return; sMode = b.dataset.m; sThread = false; sOpen = false; renderScreens(); };
+  $('splay').onclick = function () {
+    if (sTimer) { clearInterval(sTimer); sTimer = null; return; }
+    sIdx = 0; sThread = false; sOpen = false; renderScreens();
+    sTimer = setInterval(function () { if (sIdx >= 9) { clearInterval(sTimer); sTimer = null; return; } sIdx += 1; renderScreens(); }, 1100);
   };
-  $("why").onclick = function () { noteOpen = !noteOpen; render(); };
-  $("preview").onclick = function () { $("lock").classList.remove("hidden"); $("read").classList.add("hidden"); $("overlay").classList.remove("hidden"); };
-  $("notif").onclick = function () { $("lock").classList.add("hidden"); $("read").classList.remove("hidden"); };
-  $("back").onclick = function () { $("read").classList.add("hidden"); $("lock").classList.remove("hidden"); };
-  $("close").onclick = function () { $("overlay").classList.add("hidden"); };
-  $("overlay").onclick = function (e) { if (e.target === this) this.classList.add("hidden"); };
-  document.querySelectorAll(".topnav a").forEach(function (a) { a.onclick = function (e) { e.preventDefault(); }; });
-  noteOpen = true;
-  render();
+  $('sphone').onclick = function (e) {
+    var b = e.target.closest('[data-a]'); if (!b) return; var a = b.dataset.a;
+    if (a === 'open') sOpen = true; else if (a === 'back') { sOpen = false; sThread = false; } else if (a === 'thread') sThread = true;
+    beep(660, 0.06); renderScreens();
+  };
+
+  /* input */
+  var KEYMAP = { ArrowLeft: 'left', a: 'left', A: 'left', ArrowRight: 'right', d: 'right', D: 'right' };
+  window.addEventListener('keydown', function (e) {
+    var k = KEYMAP[e.key];
+    if (k && g) { g.keys[k] = true; e.preventDefault(); }
+  });
+  window.addEventListener('keyup', function (e) { var k = KEYMAP[e.key]; if (k && g) g.keys[k] = false; });
+  function hold(id, dirName) {
+    var b = $(id);
+    function down(e) { if (g) g.keys[dirName] = true; e.preventDefault(); }
+    function up() { if (g) g.keys[dirName] = false; }
+    b.addEventListener('pointerdown', down); b.addEventListener('pointerup', up); b.addEventListener('pointerleave', up); b.addEventListener('pointercancel', up);
+  }
+  hold('left', 'left'); hold('right', 'right');
+  function aim(e) { if (g && screen === 'play') { var r = cv.getBoundingClientRect(); g.target = (e.clientX - r.left) / r.width * W; } }
+  cv.addEventListener('pointermove', aim); cv.addEventListener('pointerdown', aim);
+  $('skip').onclick = function () { if (screen === 'play' && g) { g.skipped = g.t < g.dur - 1; g.t = g.dur; } };
+  $('mute').onclick = function () { muted = !muted; this.textContent = 'Sound: ' + (muted ? 'off' : 'on'); };
+
+  window.__game = { step: step, state: function () { return { screen: screen, world: wi, g: g, results: results }; } };
+  showTitle();
+  requestAnimationFrame(frame);
+})();
 </script>
 </body>
 </html>
