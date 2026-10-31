@@ -25,7 +25,7 @@
   nav.top a{color:var(--muted);text-decoration:none;font-size:13px;padding:5px 10px;border-radius:999px;white-space:nowrap}
   nav.top a:hover{background:var(--panel);color:var(--ink)}
 
-  header.hero{padding:72px 0 48px;background:
+  header.hero{padding:56px 0 40px;background:
     radial-gradient(900px 400px at 85% -10%,var(--glow),transparent 60%),
     radial-gradient(700px 400px at 0% 0%,rgba(122,162,255,.12),transparent 60%)}
   .stamp{display:inline-block;border:2px solid var(--bad);color:var(--bad);padding:3px 12px;border-radius:6px;font-weight:700;letter-spacing:.14em;font-size:12px;transform:rotate(-2deg)}
@@ -39,7 +39,7 @@
   .kpi .n .arrow{color:var(--bad);font-size:.65em;margin:0 .15em}
   .kpi p{margin:8px 0 0;color:var(--muted);font-size:13.5px}
 
-  section{padding:64px 0;border-top:1px solid var(--line)}
+  section{padding:52px 0;scroll-margin-top:52px;border-top:1px solid var(--line)}
   .eyebrow{color:var(--accent);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
   h2{font-size:clamp(26px,4vw,38px);margin:8px 0 10px;line-height:1.12;letter-spacing:-.01em}
   .sub{color:var(--muted);max-width:720px;margin:0 0 28px}
@@ -104,8 +104,12 @@
 
   .gamebox{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#0f1226;box-shadow:0 20px 60px rgba(0,0,0,.45)}
   .gamebar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 14px;background:#1b2130;color:#fbbf24;font:12px/1.4 ui-monospace,Menlo,monospace;letter-spacing:.06em}
-  #game{display:block;width:100%;height:820px;border:0;background:#0f1226}
-  @media(max-width:700px){#game{height:980px}}
+  #game{display:block;width:100%;height:700px;border:0;background:#0f1226}
+  #gameposter{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:380px;text-align:center;padding:30px 16px;background:linear-gradient(#6b8cff 0 62%,#c2410c 62%);color:#fff}
+  #gameposter .pix{font:700 clamp(18px,4vw,30px)/1.3 ui-monospace,Menlo,monospace;letter-spacing:.08em;text-shadow:3px 3px 0 #000}
+  #gameposter p{margin:0;text-shadow:1px 1px 0 #000}
+  #gameplay{font:700 18px/1 ui-monospace,Menlo,monospace;background:#c2410c;color:#fff;border:3px solid #000;box-shadow:inset -3px -3px 0 #7c2d12,inset 3px 3px 0 #fb923c;padding:14px 26px;cursor:pointer}
+  #gameplay:hover{background:#ea580c}
   /* score sim */
   .sim label{display:block;color:var(--muted);font-size:14px;margin-bottom:6px}
   .sim input[type=range]{width:100%;accent-color:var(--accent)}
@@ -148,6 +152,17 @@
   .prompt .lab{color:var(--accent2);display:block;margin-bottom:4px;font-family:system-ui,sans-serif}
   .why-this{font-size:13.5px;color:var(--muted);margin:10px 0 0}
 
+  .finds{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
+  @media(max-width:820px){.finds{grid-template-columns:1fr}}
+  .fcard{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:8px}
+  .fcard h3{font-size:19px;line-height:1.25;margin:0}
+  .fcard p{margin:0;color:#cfd6ea;font-size:15px}
+  .fcard .prompt{margin-top:auto}
+  .fnum{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#1a1200;font-weight:800;display:grid;place-items:center}
+  .chips{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px}
+  @media(max-width:820px){.chips{grid-template-columns:1fr 1fr}}
+  .chip{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;font-weight:600;display:flex;gap:10px;align-items:center}
+  .chip b{flex:none;width:26px;height:26px;border-radius:50%;background:rgba(255,179,71,.15);color:var(--accent);display:grid;place-items:center;font-size:13px}
   .checks{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
   @media(max-width:900px){.checks{grid-template-columns:1fr 1fr}}
   @media(max-width:520px){.checks{grid-template-columns:1fr}}
@@ -167,7 +182,7 @@
 
 <nav class="top"><div class="wrap">
   <b>CASE FILE · 4.2</b>
-  <a href="#fix">The fix</a><a href="#what">What happened</a><a href="#why">Why</a><a href="#how">How I found it</a><a href="#skill">The skill</a><a href="#next">Next</a>
+  <a href="#fix">The fix</a><a href="#what">What happened</a><a href="#why">Why</a><a href="#found">How I found it</a><a href="#skill">The skill</a>
 </div></nav>
 
 <header class="hero"><div class="wrap">
@@ -180,7 +195,6 @@
     <div class="kpi"><div class="n">12<span class="arrow">→</span>3–4</div><p>pings a week for each of the four quiet responders</p></div>
     <div class="kpi"><div class="n">5.5%<span class="arrow">→</span>11.1%</div><p>callouts nobody took, doubled</p></div>
   </div>
-  <p class="small" style="margin-top:18px">Rook Industries is a fictional teaching scenario from Product School's "Claude Code for PMs" course. Data is from the course database; "before" is 29 Jun–11 Aug, "after" is 12 Aug–6 Sep.</p>
 </div></header>
 
 <!-- THE FIX -->
@@ -196,10 +210,15 @@
   </div>
 
   <h3>Play the prototype: Rook Quest 4.2</h3>
-  <p class="small" style="margin-bottom:12px">A small game that makes the loop felt: catch pings as Meteor Mite across three worlds (before 4.2, after 4.2, the fix), then "warp" into the exact screens Kip and Meteor Mite would see, today and with the fix. Arrow keys or A and D to move; hit the ? blocks for the caveats.</p>
+  <p class="small" style="margin-bottom:12px">Catch pings as Meteor Mite across three worlds (before 4.2, after 4.2, the fix), then warp into the screens Kip and Meteor Mite would see. Arrow keys or A and D to move.</p>
   <div class="gamebox">
     <div class="gamebar"><span>ROOK QUEST 4.2 · The Quiet Responder</span><button class="btn light" id="fullscr" style="width:auto;margin:0;padding:5px 12px;font-size:13px">Open full size &#8599;</button></div>
-    <iframe id="game" title="Rook Quest 4.2 prototype" srcdoc="&lt;!doctype html&gt;
+    <div id="gamestage">
+      <div id="gameposter"><div class="pix">ROOK QUEST 4.2</div><p>Paused. Nothing runs until you press play.</p><button id="gameplay">&#9654; PLAY</button></div>
+      <iframe id="game" title="Rook Quest 4.2 prototype" class="hidden"></iframe>
+    </div>
+  </div>
+  <div id="gamesrc" hidden data-src="&lt;!doctype html&gt;
 &lt;html lang=&quot;en&quot;&gt;
 &lt;head&gt;
 &lt;meta charset=&quot;utf-8&quot;&gt;
@@ -292,7 +311,7 @@
   .scap small { color: #9aa3b5; display: block; margin-top: 4px; }
   .foot { margin-top: 14px; font-size: 12px; color: #b9bfdc; line-height: 1.5; }
 &lt;/style&gt;
-&lt;/head&gt;
+&lt;style&gt;body{min-height:0!important}&lt;/style&gt;&lt;/head&gt;
 &lt;body&gt;
 &lt;div class=&quot;wrap&quot;&gt;
   &lt;h1&gt;ROOK QUEST 4.2: The Quiet Responder&lt;/h1&gt;
@@ -677,8 +696,7 @@
 &lt;/script&gt;
 &lt;/body&gt;
 &lt;/html&gt;
-" loading="lazy"></iframe>
-  </div>
+"></div>
   <p class="proto-note">The game is an illustration, not Rook's real ranking. The numbers on the clear and warp screens come from the callout history, and the wording is proposed, not live. We do not know yet if the phone can show a message.</p>
 
   <div class="grid2" style="margin-top:34px">
@@ -761,61 +779,36 @@
   </div>
 </div></section>
 
-<!-- HOW -->
-<section id="how"><div class="wrap">
+<!-- FOUND -->
+<section id="found"><div class="wrap">
   <div class="eyebrow">How I found it</div>
-  <h2>Six modules, six prompts that moved the work</h2>
-  <p class="sub">For each module: one real finding and the exact prompt I wrote that produced it (typos kept).</p>
+  <h2>Four findings, four prompts</h2>
+  <div class="finds">
+    <div class="fcard">
+      <div class="fnum">1</div>
+      <h3>It was a step on 12 Aug, not a slow slide</h3>
+      <p>Daily acceptance fell from 68–75% to 40–53% on release day. Callouts nobody took doubled (5.5% to 11.1%) and appear in no ticket.</p>
+      <div class="prompt"><span class="lab">Prompts</span>compare problems against the callout data
 
-  <div class="mod">
-    <div><div class="badge">MODULE 1</div><h3>Origin Story</h3><div class="power">Get oriented. Read everything, frame the problems.</div></div>
-    <div>
-      <div class="find"><span class="lab">Finding</span><p>The break is a step on 12 Aug, not seasonal. Nine problems framed as user needs; 4.2 deliberately addressed only two of them. A ninth, found only in the data, was in no ticket: callouts nobody takes doubled from 5.5% to 11.1%.</p></div>
-      <div class="prompt"><span class="lab">My prompt (#13)</span>compare problems against the callout data</div>
-      <p class="why-this">Short, but it forced every ticket-and-interview problem to meet the numbers.</p>
+why did you grouped some days like 10-11 august and 12-16 august?</div>
     </div>
-  </div>
-
-  <div class="mod">
-    <div><div class="badge">MODULE 2</div><h3>Super Hearing</h3><div class="power">Listen to interviews and tickets, then compare.</div></div>
-    <div>
-      <div class="find"><span class="lab">Finding</span><p>Interviews and tickets agree on vanishing and quiet, but tickets show "gone quiet" outnumbers "gone before I could answer" 2 to 1. Interviews over-weighted dark mode, text size and the "callout is live" signal, which are old requests. Tickets: 40 before 12 Aug, 107 after.</p></div>
-      <div class="prompt"><span class="lab">My prompt (#16)</span>You've now read both piles. Where do they disagree? What's loud in the interviews but rare in the tickets, and what's all over the tickets that nobody brought up in the interviews?</div>
+    <div class="fcard">
+      <div class="fnum">2</div>
+      <h3>Interviews alone would have misled me</h3>
+      <p>Tickets show "gone quiet" outnumbers "gone before I could answer" 2 to 1. Interviews over-weighted dark mode and text size, which are old requests.</p>
+      <div class="prompt"><span class="lab">Prompt</span>You've now read both piles. Where do they disagree? What's loud in the interviews but rare in the tickets, and what's all over the tickets that nobody brought up in the interviews?</div>
     </div>
-  </div>
-
-  <div class="mod">
-    <div><div class="badge">MODULE 3</div><h3>Rewind</h3><div class="power">Rebuild the history from the database.</div></div>
-    <div>
-      <div class="find"><span class="lab">Finding</span><p>Daily acceptance was 68–75% on 10–11 Aug, then 40–53% on 12–16 Aug, with 4–12 missed pings a day versus 0–1 before. Splitting by responder showed four people hidden inside an average, and a Sankey chart showed outsiders taking most callouts in three areas.</p></div>
-      <div class="prompt"><span class="lab">My prompt (#3)</span>why did you grouped some days like 10-11 august and 12-16 august?</div>
-      <p class="why-this">Questioning the grouping led straight to the one-row-per-day table that exposed the cliff.</p>
+    <div class="fcard">
+      <div class="fnum">3</div>
+      <h3>The code turns a miss into a penalty that never fades</h3>
+      <p>A miss costs 0.12, like a "no". Only a yes adds points (+0.08), and nothing decays. A responder needs about 60% yes just to hold steady.</p>
+      <div class="prompt"><span class="lab">Prompt</span>Is there a way in the code to get more pings? because clearly the main problem is they are not getting enough pings to say yes so it's a vicious cycle</div>
     </div>
-  </div>
-
-  <div class="mod">
-    <div><div class="badge">MODULE 4</div><h3>X-Ray Vision</h3><div class="power">Read the routing code in plain English.</div></div>
-    <div>
-      <div class="find"><span class="lab">Finding</span><p>In <code>history.py</code>, only a yes adds points (+0.08); a decline and a miss both cost 0.12; nothing decays. A responder needs about 60% yes just to hold steady. A missed ping is treated as a choice, and it is not one.</p></div>
-      <div class="prompt"><span class="lab">My prompt (#10)</span>Is there a way in the code to get more pings? because clearly the main problem is they are not getting enough pings to say yes so it's a vicious cycle</div>
-      <p class="why-this">I named the loop before the code did. The answer: no lever exists, which is why the proposal changes the rule.</p>
-    </div>
-  </div>
-
-  <div class="mod">
-    <div><div class="badge">MODULE 5</div><h3>Super Speed</h3><div class="power">From insight to a prototype in one sitting.</div></div>
-    <div>
-      <div class="find"><span class="lab">Artifact</span><p>The playable prototype in the section above, which grew from a clickable console into a pixel-art game: three worlds (before 4.2, after 4.2, the fix), then warp zones showing Kip's console and Meteor Mite's phone today versus with the fix. Helen Achebe asked for a one-pager from the point of view of the person it happens to, so I built one proposal, not two options. Three AI Helens (Opus, Sonnet, Haiku) reviewed the brief and asked for exact words, honest wording while the cause is unproven, and guardrails with a stop rule.</p></div>
-      <div class="prompt"><span class="lab">My prompt (#11)</span>Show me this happening to Meteor Mite specifically, using her name, the way Kip would see it.</div>
-      <p class="why-this">This prompt started the prototype. The game version came from later edits that are not in prompts.md.</p>
-    </div>
-  </div>
-
-  <div class="mod">
-    <div><div class="badge">MODULE 6</div><h3>Sidekicks</h3><div class="power">Turn my own review habit into a skill.</div></div>
-    <div>
-      <div class="find"><span class="lab">Artifact</span><p>The <code>review-checklist</code> skill (next section). Its first run on my own brief scored 0 of 4, and the brief was reworked. A scheduled Monday run now repeats the check.</p></div>
-      <div class="prompt"><span class="lab">My prompt (#1)</span>Make a skill called review-checklist. When I point it at a brief, it checks that the brief: names who owns it, says how we'll know it worked, keeps the same scope start to finish, and explains the problem before the fix.</div>
+    <div class="fcard">
+      <div class="fnum">4</div>
+      <h3>The fix has to be felt by the person it happens to</h3>
+      <p>Helen asked for the view of the person it happens to, so I built one proposal as a playable prototype around Meteor Mite and Kip.</p>
+      <div class="prompt"><span class="lab">Prompt</span>Show me this happening to Meteor Mite specifically, using her name, the way Kip would see it.</div>
     </div>
   </div>
 </div></section>
@@ -823,61 +816,46 @@
 <!-- SKILL -->
 <section id="skill"><div class="wrap">
   <div class="eyebrow">Keeping it from happening again</div>
-  <h2>4.2 shipped with no owner, no success measure, no stated reason</h2>
-  <p class="sub">The handoff said Priya "made calls faster than she checked them". The wiki's 4.2 roadmap entries are one line each, nothing explains the timeout cut, and the PM could not tell if 4.2 worked. The <code>review-checklist</code> skill makes those four gaps visible before a brief goes anywhere.</p>
-
-  <div class="checks">
-    <div class="check"><div class="q">1 · Owner</div>Names who owns it and the decision to ship, stop or change.<div class="st">4.2 gap: nobody on record for the timeout cut</div></div>
-    <div class="check"><div class="q">2 · Success measure</div>A measure with baseline, target and a date, plus a stop condition.<div class="st">4.2 gap: no success measure at all</div></div>
-    <div class="check"><div class="q">3 · Same scope</div>What the opening promises is what the end measures.<div class="st">4.2 gap: three changes shipped together</div></div>
-    <div class="check"><div class="q">4 · Problem before fix</div>Who has the problem and the evidence, then the solution.<div class="st">4.2 gap: fix described, reason missing</div></div>
+  <h2>A skill that checks every brief before it ships</h2>
+  <p class="sub">4.2 had no owner on record, no success measure and no stated reason for the timeout cut. <code>review-checklist</code> checks for exactly that.</p>
+  <div class="chips">
+    <div class="chip"><b>1</b>Who owns it?</div>
+    <div class="chip"><b>2</b>How will we know it worked?</div>
+    <div class="chip"><b>3</b>Same scope start to finish?</div>
+    <div class="chip"><b>4</b>Problem before fix?</div>
   </div>
-
   <div class="ba">
-    <div class="card" style="text-align:center"><div class="small">First run on my brief</div><div class="score fail">0 / 4</div><div class="small" style="margin-top:6px">no owner line, no measurable success, scope drifted, fix before problem</div></div>
+    <div class="card" style="text-align:center"><div class="small">First run on my brief</div><div class="score fail">0 / 4</div></div>
     <div class="arr">→</div>
-    <div class="card">
-      <div class="small">What I changed in the brief</div>
-      <ul style="margin:6px 0 0;padding-left:18px;font-size:14px">
-        <li>Owner line: the Product Manager, Rook Dispatch</li>
-        <li>Success table with targets and guardrails</li>
-        <li>One scope: the four quiet responders</li>
-        <li>Problem section moved above the fix</li>
-      </ul>
-    </div>
+    <div class="card" style="text-align:center"><div class="small">Then I added an owner, success targets, one scope and the problem first</div><div class="score" style="font-size:28px;color:var(--good);margin-top:6px">Reworked</div></div>
   </div>
-  <p class="small" style="margin-top:14px">I have not re-run the skill on the reworked brief, so I am not claiming a new score. Still open in it: who calls the roll-back, the trial start date, and Nadia Hoffmann's check of the "about 7 gone-quiet tickets a week" baseline.</p>
-
-  <div class="card" style="margin-top:20px">
-    <h3>The habit: it runs every Monday</h3>
-    <p class="small" style="margin:0">Scheduled task <code>review-checklist-monday</code> runs Mondays at about 8:11 while the app is open. It points at <code>06-sidekicks/briefs/</code>, which does not exist in this repo yet, so it is a habit set, not a result. The saved output from 13 Oct reports four briefs with one gap each (no owner, no success measure, scope growing mid-document, solution before problem). I have not read those four wiki briefs myself.</p>
-  </div>
+  <div class="prompt" style="margin-top:20px"><span class="lab">Prompt</span>Make a skill called review-checklist. When I point it at a brief, it checks that the brief: names who owns it, says how we'll know it worked, keeps the same scope start to finish, and explains the problem before the fix.</div>
+  <p class="small" style="margin-top:12px">Scheduled to run every Monday. I have not re-scored the reworked brief, and the folder the schedule reads does not exist yet.</p>
 </div></section>
 
-<!-- NEXT -->
-<section id="next"><div class="wrap">
-  <div class="eyebrow">Next</div>
-  <h2>What I need, and from whom</h2>
-  <div class="card" style="margin-top:20px"><table>
-    <tr><th>Question</th><th>Owner</th></tr>
-    <tr><td>Ranking scores over time? Why was the wait cut to 60 seconds?</td><td>Marcus Oyelaran</td></tr>
-    <tr><td>Size and time for the recovery rule? Did the ranking change apply to responders already turning jobs down (asked 14 Aug)?</td><td>Wen Li, Marcus Oyelaran</td></tr>
-    <tr><td>Did anything change on those accounts or phones around 12 Aug? Can the phone show a message?</td><td>Marcus Oyelaran</td></tr>
-    <tr><td>Does the change touch the availability record Rook Supply reads?</td><td>Rook Supply team (not asked yet)</td></tr>
-    <tr><td>Numbers after 6 Sep and last August, to test seasonality</td><td>Ravi Menon</td></tr>
-    <tr><td>Does this replace a Q3 commitment (Availability Confidence did not ship)?</td><td>Helen Achebe</td></tr>
-  </table></div>
-</div></section>
-
-<footer><div class="wrap">Final report · Product School "Claude Code for PMs" (cohort ccpm-2026.1). Rook Industries is fictional; nothing here is a fact about the world. Built with Claude Code from CLAUDE.md, the six prompts.md files, <code>05-super-speed/prototype.html</code> and the <code>review-checklist</code> skill.</div></footer>
+<footer><div class="wrap">Final report · Product School "Claude Code for PMs" (cohort ccpm-2026.1). Rook Industries is fictional.</div></footer>
 
 <script>
 (function(){
   function $(id){return document.getElementById(id)}
+  var WEEKS=["29 Jun","6 Jul","13 Jul","20 Jul","27 Jul","3 Aug","10 Aug","17 Aug","24 Aug","31 Aug"];
+  function gameSrc(){return $("gamesrc").getAttribute("data-src")}
+  var fit=null;
+  $("gameplay").onclick=function(){
+    var f=$("game");f.srcdoc=gameSrc();f.classList.remove("hidden");$("gameposter").classList.add("hidden");
+    f.onload=function(){
+      if(fit)clearInterval(fit);
+      fit=setInterval(function(){try{var h=Math.ceil(f.contentDocument.body.getBoundingClientRect().height);if(h>200&&Math.abs(h-f.offsetHeight)>2)f.style.height=h+"px"}catch(e){}},400);
+    };
+  };
   $("fullscr").onclick=function(){
-    var u=URL.createObjectURL(new Blob([$("game").srcdoc],{type:"text/html"}));
+    var u=URL.createObjectURL(new Blob([gameSrc()],{type:"text/html"}));
     window.open(u,"_blank");
   };
+  // Menu: scroll in-page (hash links are blocked when the report is opened as a data page)
+  Array.prototype.forEach.call(document.querySelectorAll("nav.top a"),function(a){
+    a.onclick=function(e){e.preventDefault();var t=document.querySelector(a.getAttribute("href"));if(t)t.scrollIntoView({behavior:"smooth",block:"start"})};
+  });
 
   // Score illustration: net change per ping. Non-yes pings assumed 80% missed / 20% turned down.
   function net(y,missCost){return 0.08*y-(1-y)*(0.8*missCost+0.2*0.12)}
