@@ -102,6 +102,10 @@
   .btn.light{border-color:var(--accent2);color:var(--accent2);margin-top:12px;width:100%}
   .btn.light:hover{background:rgba(122,162,255,.12)}
 
+  .gamebox{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#0f1226;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+  .gamebar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 14px;background:#1b2130;color:#fbbf24;font:12px/1.4 ui-monospace,Menlo,monospace;letter-spacing:.06em}
+  #game{display:block;width:100%;height:820px;border:0;background:#0f1226}
+  @media(max-width:700px){#game{height:980px}}
   /* score sim */
   .sim label{display:block;color:var(--muted);font-size:14px;margin-bottom:6px}
   .sim input[type=range]{width:100%;accent-color:var(--accent)}
@@ -191,48 +195,491 @@
     <div class="card ask"><div class="num">3</div><div><b>Does it replace a Q3 commitment?</b><p>Helen Achebe to tell me. Still open.</p></div></div>
   </div>
 
-  <h3>Try the prototype: Meteor Mite, the way Kip sees it</h3>
-  <p class="small" style="margin-bottom:12px">Hit replay or drag the week. Open "Why is this?" and "What Meteor Mite sees".</p>
+  <h3>Play the prototype: Rook Quest 4.2</h3>
+  <p class="small" style="margin-bottom:12px">A small game that makes the loop felt: catch pings as Meteor Mite across three worlds (before 4.2, after 4.2, the fix), then "warp" into the exact screens Kip and Meteor Mite would see, today and with the fix. Arrow keys or A and D to move; hit the ? blocks for the caveats.</p>
+  <div class="gamebox">
+    <div class="gamebar"><span>ROOK QUEST 4.2 · The Quiet Responder</span><button class="btn light" id="fullscr" style="width:auto;margin:0;padding:5px 12px;font-size:13px">Open full size &#8599;</button></div>
+    <iframe id="game" title="Rook Quest 4.2 prototype" srcdoc="&lt;!doctype html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+&lt;title&gt;Rook Quest 4.2&lt;/title&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+  :root {
+    --night: #0f1226; --ink: #f8f1d8; --gold: #fbbf24; --orange: #c2410c; --sky: #6b8cff;
+    --panel: #14183a; --line: #f8f1d8; --red: #ef4444; --green: #4ade80;
+    --pix: &#x27;Press Start 2P&#x27;, &#x27;Courier New&#x27;, monospace;
+    --body: ui-monospace, &#x27;SF Mono&#x27;, Menlo, Consolas, &#x27;Courier New&#x27;, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--night); color: var(--ink); font-family: var(--body); min-height: 100vh; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 14px 12px 28px; }
+  h1 { font: 14px/1.5 var(--pix); margin: 0 0 6px; color: var(--gold); text-shadow: 2px 2px 0 #7c2d12; }
+  .sub { font-size: 12px; color: #b9bfdc; margin: 0 0 12px; line-height: 1.5; }
+  #frame { position: relative; width: 100%; aspect-ratio: 16 / 9; border: 4px solid var(--line); border-radius: 6px; background: var(--sky); overflow: hidden; box-shadow: 0 0 0 4px #000; }
+  canvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; touch-action: none; }
+  #ui { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 10px; background: rgba(10, 12, 30, .55); }
+  #ui.hidden { display: none; }
+  .card { background: var(--panel); border: 4px double var(--line); border-radius: 4px; padding: 14px 18px; max-width: 640px; width: 100%; max-height: 100%; overflow: auto; font-size: 13px; line-height: 1.55; }
+  .card h2 { font: 12px/1.6 var(--pix); margin: 0 0 8px; color: var(--gold); }
+  .card h3 { font: 9px/1.6 var(--pix); margin: 10px 0 4px; color: var(--green); }
+  .card p { margin: 0 0 8px; }
+  .card ul { margin: 0 0 8px; padding-left: 18px; }
+  .card li { margin-bottom: 3px; }
+  .say { background: #0a0d22; border: 2px solid var(--gold); padding: 8px 10px; margin: 0 0 8px; font-size: 12px; }
+  .say b { color: var(--gold); display: block; font: 8px/1.6 var(--pix); margin-bottom: 3px; }
+  .btns { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+  .btn { font: 10px/1.4 var(--pix); background: var(--orange); color: #fff; border: 3px solid #000; box-shadow: inset -3px -3px 0 #7c2d12, inset 3px 3px 0 #fb923c; padding: 10px 14px; cursor: pointer; }
+  .btn:hover, .btn:focus-visible { background: #ea580c; outline: 2px solid var(--gold); }
+  .btn.alt { background: #334155; box-shadow: inset -3px -3px 0 #1e293b, inset 3px 3px 0 #64748b; }
+  .qb { display: inline-block; vertical-align: middle; font: 12px/1 var(--pix); width: 34px; height: 34px; margin: 4px 8px 4px 0; background: #f59e0b; color: #fff; border: 3px solid #7c2d12; box-shadow: inset 3px 3px 0 #fde68a; cursor: pointer; text-shadow: 2px 2px 0 #7c2d12; }
+  .qb:hover { transform: translateY(-3px); }
+  .qb.bump { animation: bump .25s; }
+  @keyframes bump { 50% { transform: translateY(-9px); } }
+  .qrow { display: flex; align-items: flex-start; gap: 4px; margin-bottom: 4px; }
+  .fact { padding-top: 7px; font-size: 12.5px; }
+  .fact.off { color: #8a91b4; font-size: 11px; }
+  #pad { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; align-items: center; }
+  #pad .btn { padding: 12px 18px; }
+  #pad .hint { font-size: 12px; color: #b9bfdc; flex: 1; min-width: 180px; }
 
-  <div class="console">
-    <div class="nav"><span class="logo">ROOK · Dispatch</span><span class="on">Coverage</span><span>Callouts</span><span>Responders</span><span>Reports</span><span class="who">Kip · Handler</span></div>
-    <div class="body">
-      <div class="crumb">Your responders · week of <span id="crumbweek">31 Aug</span></div>
-      <div class="replay">
-        <button class="btn solid" id="play">&#9654; Replay Meteor Mite</button>
-        <label for="week">Week of <b id="weeklabel">31 Aug</b></label>
-        <input type="range" id="week" min="0" max="9" value="9" aria-label="Week to show">
-        <span id="weekmark"></span>
-      </div>
-      <div class="ccards">
-        <section class="ccard" style="padding:14px 16px;border-top:1px solid #dde1e8">
-          <div class="head"><h4>Meteor Mite</h4><span class="area">Eastgate</span></div>
-          <span class="tag" id="mmtag"></span>
-          <div class="big"><span id="mmbig"></span> <small id="mmsmall"></small></div>
-          <div class="bars" id="mmbars"></div>
-          <div class="axis"><span>29 Jun</span><span>12 Aug</span><span>31 Aug</span></div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn" id="why" aria-expanded="false">Why is this?</button>
-            <button class="btn" id="preview">What Meteor Mite sees</button>
-          </div>
-          <div class="why hidden" id="whybox">
-            <p><b>Quiet since 12 Aug.</b> Pings a week: 11 before, <span id="nownum">1</span> now. The ping wait was cut from 90 to 60 seconds that day. We are checking if that is why. Meteor Mite is still on the list.</p>
-            <p class="added">Misses now count less against ranking.</p>
-            <div class="small">We have not proven the cause yet.</div>
-          </div>
-        </section>
-        <section class="ccard" style="padding:14px 16px;border-top:1px solid #dde1e8">
-          <div class="head"><h4>The Gale</h4><span class="area">Eastgate</span></div>
-          <span class="tag busy" id="gtag"></span>
-          <div class="big"><span id="gbig"></span> <small id="gsmall"></small></div>
-          <div class="bars" id="gbars"></div>
-          <div class="axis"><span>29 Jun</span><span>12 Aug</span><span>31 Aug</span></div>
-          <p class="hint" id="ghint" style="margin:0"></p>
-        </section>
-      </div>
-    </div>
+  .hidden { display: none !important; }
+  #screens { margin-top: 0; border: 4px solid var(--line); border-radius: 6px; background: var(--panel); box-shadow: 0 0 0 4px #000; padding: 14px; }
+  #screens h2 { font: 12px/1.6 var(--pix); margin: 0 0 8px; color: var(--gold); }
+  .sbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 12px; font-size: 12px; }
+  .sbar input[type=range] { flex: 1; min-width: 140px; accent-color: var(--gold); }
+  .seg { display: inline-flex; border: 3px solid #000; }
+  .seg button { font: 8px/1.4 var(--pix); background: #334155; color: #fff; border: 0; padding: 9px 10px; cursor: pointer; }
+  .seg button[aria-pressed=&quot;true&quot;] { background: var(--orange); }
+  .two { display: grid; grid-template-columns: 1.5fr 1fr; gap: 14px; align-items: start; }
+  @media (max-width: 760px) { .two { grid-template-columns: 1fr; } }
+  .paneh { font: 8px/1.5 var(--pix); color: var(--green); margin-bottom: 6px; }
+  .app { background: #f3f4f7; color: #1b2130; border: 3px solid #000; }
+  .apptop { background: #1b2130; color: #dfe4ee; font-size: 12px; padding: 7px 10px; display: flex; justify-content: space-between; }
+  .appbody { padding: 10px; }
+  .acards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 520px) { .acards { grid-template-columns: 1fr; } }
+  .acard { background: #fff; border: 1px solid #d5d9e2; border-radius: 8px; padding: 10px 12px; }
+  .acard h4 { margin: 0; font-size: 14px; display: flex; justify-content: space-between; }
+  .acard h4 span { font-weight: 400; color: #5f6879; font-size: 12px; }
+  .atag { display: inline-block; font-size: 11px; padding: 1px 8px; border-radius: 999px; background: #fdf0e3; color: #a8480a; margin: 5px 0; }
+  .abig { font-size: 22px; font-weight: 700; line-height: 1.1; margin-top: 4px; }
+  .abig small { font-size: 11px; font-weight: 400; color: #5f6879; }
+  .abars { display: flex; align-items: flex-end; gap: 3px; height: 44px; margin: 8px 0 2px; }
+  .abars span { flex: 1; background: #9db3e8; border-radius: 2px 2px 0 0; min-height: 3px; }
+  .abars span.now { background: #d9822b; }
+  .abars span.future { opacity: .18; }
+  .abars span.sel { outline: 2px solid #1b2130; outline-offset: 1px; }
+  .aaxis { display: flex; justify-content: space-between; font-size: 10px; color: #5f6879; }
+  .anote { margin-top: 8px; border-left: 4px solid #a8480a; background: #fdf0e3; padding: 8px 10px; font-size: 12px; border-radius: 0 8px 8px 0; }
+  .anone { margin-top: 8px; font-size: 12px; color: #6b7385; font-style: italic; }
+  .bubble { margin-top: 10px; background: #0a0d22; border: 2px solid var(--gold); color: var(--ink); padding: 8px 10px; font-size: 12px; }
+  .bubble.ok { border-color: var(--green); }
+  .pphone { margin: 0 auto; width: 232px; border: 8px solid #222834; border-radius: 28px; background: #0f131b; color: #eef1f7; min-height: 360px; padding: 14px 12px; }
+  .ptime { text-align: center; font-size: 34px; font-weight: 300; margin: 10px 0 16px; }
+  .pnotif, .pmsg { background: #232a38; border-radius: 12px; padding: 10px; font-size: 13px; width: 100%; text-align: left; color: inherit; border: 0; font-family: inherit; display: block; margin-bottom: 8px; }
+  .pnotif { cursor: pointer; }
+  .pnotif:hover { background: #2c3445; }
+  .pnotif b, .pmsg b { display: block; font-size: 11px; color: #9db3e8; margin-bottom: 2px; }
+  .pmsg.me { background: #1d4ed8; margin-left: 28px; }
+  .pmsg.kip { margin-right: 28px; }
+  .pempty { text-align: center; color: #6b7385; font-size: 12px; margin-top: 70px; }
+  .pbtn { font: 8px/1.4 var(--pix); background: #334155; color: #fff; border: 3px solid #000; padding: 8px 10px; cursor: pointer; margin: 8px auto 0; display: block; }
+  .scap { font-size: 13px; line-height: 1.55; margin: 12px 0 0; }
+  .scap small { color: #9aa3b5; display: block; margin-top: 4px; }
+  .foot { margin-top: 14px; font-size: 12px; color: #b9bfdc; line-height: 1.5; }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;wrap&quot;&gt;
+  &lt;h1&gt;ROOK QUEST 4.2: The Quiet Responder&lt;/h1&gt;
+  &lt;p class=&quot;sub&quot;&gt;A prototype for Helen Achebe. It is a game that explains what we found and what we propose. The numbers on the clear screens come from the callout history. The game itself is an illustration, not Rook&#x27;s real ranking.&lt;/p&gt;
+
+  &lt;div id=&quot;frame&quot;&gt;
+    &lt;canvas id=&quot;c&quot; width=&quot;480&quot; height=&quot;270&quot; aria-label=&quot;Game screen&quot;&gt;&lt;/canvas&gt;
+    &lt;div id=&quot;ui&quot;&gt;&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;section id=&quot;screens&quot; class=&quot;hidden&quot; aria-label=&quot;What Kip and Meteor Mite see&quot;&gt;
+    &lt;h2&gt;WARP ZONE: WHAT KIP AND METEOR MITE SEE&lt;/h2&gt;
+    &lt;div class=&quot;sbar&quot;&gt;
+      &lt;div class=&quot;seg&quot; id=&quot;mode&quot; role=&quot;group&quot; aria-label=&quot;Which version to show&quot;&gt;
+        &lt;button data-m=&quot;today&quot; aria-pressed=&quot;true&quot;&gt;TODAY, AFTER 4.2&lt;/button&gt;
+        &lt;button data-m=&quot;fix&quot; aria-pressed=&quot;false&quot;&gt;WITH OUR FIX&lt;/button&gt;
+      &lt;/div&gt;
+      &lt;label for=&quot;sslider&quot;&gt;Week of &lt;b id=&quot;sweek&quot;&gt;31 Aug&lt;/b&gt;&lt;/label&gt;
+      &lt;input type=&quot;range&quot; id=&quot;sslider&quot; min=&quot;0&quot; max=&quot;9&quot; value=&quot;9&quot; aria-label=&quot;Week to show&quot;&gt;
+      &lt;button class=&quot;btn alt&quot; id=&quot;splay&quot;&gt;&amp;#9654; REPLAY&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;two&quot;&gt;
+      &lt;div&gt;&lt;div class=&quot;paneh&quot;&gt;KIP&#x27;S CONSOLE&lt;/div&gt;&lt;div id=&quot;sconsole&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+      &lt;div&gt;&lt;div class=&quot;paneh&quot;&gt;METEOR MITE&#x27;S PHONE&lt;/div&gt;&lt;div id=&quot;sphone&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;p class=&quot;scap&quot; id=&quot;scap&quot;&gt;&lt;/p&gt;
+    &lt;div class=&quot;btns&quot;&gt;&lt;button class=&quot;btn&quot; id=&quot;snext&quot;&gt;CONTINUE&lt;/button&gt;&lt;/div&gt;
+  &lt;/section&gt;
+
+  &lt;div id=&quot;pad&quot;&gt;
+    &lt;button class=&quot;btn&quot; id=&quot;left&quot; aria-label=&quot;Move left&quot;&gt;&amp;#9664;&lt;/button&gt;
+    &lt;button class=&quot;btn&quot; id=&quot;right&quot; aria-label=&quot;Move right&quot;&gt;&amp;#9654;&lt;/button&gt;
+    &lt;button class=&quot;btn alt&quot; id=&quot;skip&quot;&gt;Skip round&lt;/button&gt;
+    &lt;button class=&quot;btn alt&quot; id=&quot;mute&quot;&gt;Sound: on&lt;/button&gt;
+    &lt;span class=&quot;hint&quot;&gt;Move with the arrow keys, A and D, the buttons, or by pointing at the screen.&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;p class=&quot;foot&quot;&gt;Meteor Mite is the worked example. The same plan covers the other three quiet responders: Farlight, The Undertow and Vesper.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+(function () {
+  var cv = document.getElementById(&#x27;c&#x27;), ctx = cv.getContext(&#x27;2d&#x27;);
+  ctx.imageSmoothingEnabled = false;
+  var W = 480, H = 270, GY = 222;
+  var FONT = &quot;&#x27;Press Start 2P&#x27;,&#x27;Courier New&#x27;,monospace&quot;;
+  var ui = document.getElementById(&#x27;ui&#x27;);
+
+  var WORLDS = [
+    { id: &#x27;1-1&#x27;, title: &#x27;BEFORE 4.2&#x27;, wait: 90, fall: 5.2, cost: 0.12, drift: 0 },
+    { id: &#x27;1-2&#x27;, title: &#x27;AFTER 4.2&#x27;, wait: 60, fall: 0.8, cost: 0.12, drift: 0 },
+    { id: &#x27;1-3&#x27;, title: &#x27;THE FIX&#x27;, wait: 60, fall: 0.8, cost: 0.06, drift: 0.03 }
+  ];
+  var screen = &#x27;title&#x27;, wi = 0, g = null, results = [], muted = false, ac = null, last = 0, clouds = [], cloudX = 0;
+  for (var i = 0; i &lt; 5; i++) clouds.push({ x: i * 110 + 20, y: 30 + (i % 3) * 28 });
+
+  function $(id) { return document.getElementById(id); }
+  function pad3(n) { return (&#x27;00&#x27; + n).slice(-3); }
+
+  /* sound: tiny square-wave beeps, only after the first click */
+  function beep(f, d, t) {
+    if (muted) return;
+    try {
+      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      var o = ac.createOscillator(), gn = ac.createGain();
+      o.type = t || &#x27;square&#x27;; o.frequency.value = f; gn.gain.value = 0.04;
+      o.connect(gn); gn.connect(ac.destination); o.start(); o.stop(ac.currentTime + d);
+    } catch (e) {}
+  }
+
+  /* pixel sprites */
+  var PAL = { o: &#x27;#c2410c&#x27;, y: &#x27;#fbbf24&#x27;, w: &#x27;#ffffff&#x27;, k: &#x27;#1b1b1b&#x27;, r: &#x27;#dc2626&#x27; };
+  var MITE = [
+    &#x27;..oooooo..&#x27;,
+    &#x27;.oyyyyyyo.&#x27;,
+    &#x27;oyyyyyyyyo&#x27;,
+    &#x27;oywkyywkyo&#x27;,
+    &#x27;oyyyyyyyyo&#x27;,
+    &#x27;oyyrrrryyo&#x27;,
+    &#x27;.oyyyyyyo.&#x27;,
+    &#x27;..oooooo..&#x27;,
+    &#x27;.kk....kk.&#x27;
+  ];
+  function sprite(map, x, y, s) {
+    for (var r = 0; r &lt; map.length; r++) for (var c = 0; c &lt; map[r].length; c++) {
+      var ch = map[r][c]; if (ch === &#x27;.&#x27;) continue;
+      ctx.fillStyle = PAL[ch]; ctx.fillRect(Math.round(x + c * s), Math.round(y + r * s), s, s);
+    }
+  }
+  function text(str, x, y, size, color, align) {
+    ctx.font = &#x27;bold &#x27; + size + &#x27;px &#x27; + FONT; ctx.textAlign = align || &#x27;left&#x27;; ctx.textBaseline = &#x27;top&#x27;;
+    ctx.fillStyle = &#x27;#000&#x27;; ctx.fillText(str, x + 1, y + 1);
+    ctx.fillStyle = color || &#x27;#fff&#x27;; ctx.fillText(str, x, y);
+  }
+
+  /* scene */
+  function drawScene(t) {
+    ctx.fillStyle = &#x27;#6b8cff&#x27;; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = &#x27;#fff&#x27;;
+    clouds.forEach(function (c) {
+      var x = ((c.x - cloudX) % (W + 80) + (W + 80)) % (W + 80) - 40, y = c.y;
+      ctx.fillRect(x, y + 6, 44, 10); ctx.fillRect(x + 8, y, 28, 8); ctx.fillRect(x + 4, y + 14, 36, 4);
+      ctx.fillStyle = &#x27;#c7d7ff&#x27;; ctx.fillRect(x + 4, y + 16, 36, 2); ctx.fillStyle = &#x27;#fff&#x27;;
+    });
+    [[60, 90, 38], [330, 120, 44], [440, 70, 30]].forEach(function (h) {
+      ctx.fillStyle = &#x27;#2f9e44&#x27;;
+      for (var dx = -h[1] / 2; dx &lt; h[1] / 2; dx += 4) {
+        var ht = Math.round(h[2] * Math.sqrt(1 - Math.pow(dx / (h[1] / 2), 2)));
+        ctx.fillRect(h[0] + dx, GY - ht, 4, ht);
+      }
+    });
+    ctx.fillStyle = &#x27;#c2410c&#x27;; ctx.fillRect(0, GY, W, H - GY);
+    ctx.fillStyle = &#x27;#7c2d12&#x27;;
+    for (var y = GY; y &lt; H; y += 16) {
+      ctx.fillRect(0, y, W, 2);
+      for (var x = ((y - GY) / 16 % 2) * 16; x &lt; W; x += 32) ctx.fillRect(x, y, 2, 16);
+    }
+    ctx.fillStyle = &#x27;#fb923c&#x27;; ctx.fillRect(0, GY, W, 2);
+  }
+
+  function drawHud() {
+    var w = WORLDS[wi];
+    text(&#x27;METEOR MITE&#x27;, 16, 10, 8, &#x27;#fff&#x27;);
+    text(pad3(g ? g.taken : 0), 16, 22, 8, &#x27;#fff&#x27;);
+    text(&#x27;MISSED&#x27;, 150, 10, 8, &#x27;#fff&#x27;);
+    text(&#x27;x&#x27; + (&#x27;0&#x27; + (g ? g.missed : 0)).slice(-2), 150, 22, 8, &#x27;#fca5a5&#x27;);
+    text(&#x27;WORLD&#x27;, 270, 10, 8, &#x27;#fff&#x27;);
+    text(w.id, 270, 22, 8, &#x27;#fff&#x27;);
+    text(&#x27;TIME&#x27;, 390, 10, 8, &#x27;#fff&#x27;);
+    text(pad3(g ? Math.max(0, Math.ceil(g.dur - g.t)) : 0), 390, 22, 8, &#x27;#fff&#x27;);
+    text(&#x27;PLACE IN LINE&#x27;, 16, 40, 7, &#x27;#fde68a&#x27;);
+    ctx.fillStyle = &#x27;#000&#x27;; ctx.fillRect(112, 38, 124, 12);
+    var s = g ? g.score : 0.7;
+    ctx.fillStyle = s &gt; 0.5 ? &#x27;#4ade80&#x27; : s &gt; 0.25 ? &#x27;#fbbf24&#x27; : &#x27;#ef4444&#x27;;
+    ctx.fillRect(114, 40, Math.round(120 * s), 8);
+    if (wi === 2) { ctx.fillStyle = &#x27;#fff&#x27;; ctx.fillRect(114 + 60, 36, 2, 16); text(&#x27;NEUTRAL&#x27;, 174, 52, 6, &#x27;#fff&#x27;, &#x27;center&#x27;); }
+  }
+
+  function drawPing(p) {
+    ctx.fillStyle = &#x27;#7c2d12&#x27;; ctx.fillRect(p.x - 8, p.y, 16, 16);
+    ctx.fillStyle = &#x27;#f59e0b&#x27;; ctx.fillRect(p.x - 6, p.y + 2, 12, 12);
+    ctx.fillStyle = &#x27;#fde68a&#x27;; ctx.fillRect(p.x - 6, p.y + 2, 12, 2); ctx.fillRect(p.x - 6, p.y + 2, 2, 12);
+    text(&#x27;?&#x27;, p.x, p.y + 4, 9, &#x27;#fff&#x27;, &#x27;center&#x27;);
+  }
+
+  function render() {
+    drawScene();
+    if (screen === &#x27;play&#x27; &amp;&amp; g) {
+      g.pings.forEach(drawPing);
+      g.pops.forEach(function (p) { text(p.t, p.x, p.y, 8, p.c, &#x27;center&#x27;); });
+      sprite(MITE, g.x - 10, GY - 18, 2);
+      if (g.score &lt; 0.3) text(&#x27;...phone is quiet...&#x27;, g.x, GY - 40, 7, &#x27;#fff&#x27;, &#x27;center&#x27;);
+    } else {
+      sprite(MITE, W / 2 - 10 + (screen === &#x27;title&#x27; ? 0 : 0), GY - 18, 2);
+    }
+    drawHud();
+  }
+
+  /* game loop */
+  function startRound(i) {
+    wi = i;
+    var s0 = i === 2 ? (results[1] ? results[1].end : 0.15) : 0.7;
+    g = { x: W / 2, score: s0, taken: 0, missed: 0, offered: 0, t: 0, spawnT: 0.4, pings: [], pops: [], target: null, keys: {}, dur: 24, stopAt: 20 };
+    screen = &#x27;play&#x27;; ui.classList.add(&#x27;hidden&#x27;);
+  }
+  function step(dt) {
+    cloudX += 6 * dt;
+    if (screen !== &#x27;play&#x27; || !g) return;
+    var w = WORLDS[wi], dir = 0;
+    g.t += dt;
+    if (g.keys.left) dir -= 1;
+    if (g.keys.right) dir += 1;
+    if (dir) { g.x += dir * 200 * dt; g.target = null; }
+    else if (g.target != null) { var d = g.target - g.x; if (Math.abs(d) &gt; 2) g.x += (d &gt; 0 ? 1 : -1) * Math.min(Math.abs(d), 200 * dt); }
+    g.x = Math.max(14, Math.min(W - 14, g.x));
+    if (w.drift) {
+      if (g.score &lt; 0.5) g.score = Math.min(0.5, g.score + w.drift * dt);
+      else if (g.score &gt; 0.5) g.score = Math.max(0.5, g.score - w.drift * dt);
+    }
+    if (g.t &lt; g.stopAt) {
+      g.spawnT -= dt;
+      if (g.spawnT &lt;= 0) {
+        g.pings.push({ x: 24 + Math.random() * (W - 48), y: -16 }); g.offered++;
+        g.spawnT = (1.05 + Math.random() * 0.3) / Math.max(g.score, 0.12);
+      }
+    }
+    var v = (GY + 16) / w.fall;
+    g.pings = g.pings.filter(function (p) {
+      p.y += v * dt;
+      var bottom = p.y + 16;
+      if (bottom &gt;= GY - 20 &amp;&amp; p.y &lt; GY &amp;&amp; Math.abs(p.x - g.x) &lt; 18) {
+        g.taken++; g.score = Math.min(1, g.score + 0.08); g.pops.push({ x: p.x, y: p.y - 6, t: &#x27;+1&#x27;, c: &#x27;#4ade80&#x27;, l: 0.7 }); beep(880, 0.08); return false;
+      }
+      if (bottom &gt;= GY) {
+        g.missed++; g.score = Math.max(0, g.score - w.cost); g.pops.push({ x: p.x, y: GY - 22, t: &#x27;MISS&#x27;, c: &#x27;#fca5a5&#x27;, l: 0.9 }); beep(160, 0.18, &#x27;sawtooth&#x27;); return false;
+      }
+      return true;
+    });
+    g.pops = g.pops.filter(function (p) { p.l -= dt; p.y -= 12 * dt; return p.l &gt; 0; });
+    if (g.t &gt;= g.dur) endRound();
+  }
+  function endRound() {
+    results[wi] = { offered: g.offered, taken: g.taken, missed: g.missed, end: g.score, skipped: !!g.skipped };
+    screen = &#x27;clear&#x27;; showClear(wi); beep(660, 0.15); setTimeout(function () { beep(990, 0.2); }, 150);
+  }
+  function frame(ts) {
+    var dt = Math.min(0.05, (ts - last) / 1000 || 0); last = ts;
+    step(dt); render(); requestAnimationFrame(frame);
+  }
+
+  /* cards */
+  function card(html, buttons) {
+    ui.innerHTML = &#x27;&lt;div class=&quot;card&quot;&gt;&#x27; + html + &#x27;&lt;div class=&quot;btns&quot;&gt;&#x27; +
+      buttons.map(function (b, i) { return &#x27;&lt;button class=&quot;btn&#x27; + (b.alt ? &#x27; alt&#x27; : &#x27;&#x27;) + &#x27;&quot; data-i=&quot;&#x27; + i + &#x27;&quot;&gt;&#x27; + b.label + &#x27;&lt;/button&gt;&#x27;; }).join(&#x27;&#x27;) + &#x27;&lt;/div&gt;&lt;/div&gt;&#x27;;
+    ui.classList.remove(&#x27;hidden&#x27;);
+    Array.prototype.forEach.call(ui.querySelectorAll(&#x27;.btns .btn&#x27;), function (el) { el.onclick = buttons[+el.dataset.i].fn; });
+    Array.prototype.forEach.call(ui.querySelectorAll(&#x27;.qb&#x27;), function (el) {
+      el.onclick = function () {
+        el.classList.add(&#x27;bump&#x27;); beep(1040, 0.1);
+        var f = el.parentNode.querySelector(&#x27;.fact&#x27;); f.classList.remove(&#x27;off&#x27;); f.textContent = el.dataset.t;
+        el.textContent = &#x27;!&#x27;; el.style.background = &#x27;#a16207&#x27;; el.onclick = null;
+      };
+    });
+    var first = ui.querySelector(&#x27;.btns .btn&#x27;); if (first) first.focus({ preventScroll: true });
+  }
+  function qb(hidden, shown) { return &#x27;&lt;div class=&quot;qrow&quot;&gt;&lt;button class=&quot;qb&quot; data-t=&quot;&#x27; + shown.replace(/&quot;/g, &#x27;&amp;quot;&#x27;) + &#x27;&quot; aria-label=&quot;Hit the block&quot;&gt;?&lt;/button&gt;&lt;span class=&quot;fact off&quot;&gt;&#x27; + hidden + &#x27;&lt;/span&gt;&lt;/div&gt;&#x27;; }
+
+  function showTitle() {
+    screen = &#x27;title&#x27;; g = null; wi = 0;
+    card(&#x27;&lt;h2&gt;ROOK QUEST 4.2&lt;/h2&gt;&#x27; +
+      &#x27;&lt;p&gt;&lt;b&gt;Meteor Mite&lt;/b&gt; used to get about 11 pings a week. Since release 4.2 on 12 Aug, about 1. Their handler Kip has nothing true to say about it.&lt;/p&gt;&#x27; +
+      &#x27;&lt;p&gt;Play three short worlds to see why a responder goes quiet, then warp into the screens Kip and Meteor Mite see, and see what we propose. Catch the ? pings before they hit the ground.&lt;/p&gt;&#x27; +
+      &#x27;&lt;h3&gt;HIT A BLOCK&lt;/h3&gt;&#x27; + qb(&#x27;Hit the block to see what the game cannot show you.&#x27;, &#x27;The game is an illustration. We have not proven why the four responders stopped answering. The real cause could be a phone or alert problem.&#x27;),
+      [{ label: &#x27;PRESS START&#x27;, fn: function () { showIntro(0); } }]);
+  }
+  function showIntro(i) {
+    screen = &#x27;intro&#x27;; wi = i; var w = WORLDS[i];
+    var rules = i === 0
+      ? &#x27;&lt;p&gt;The ping wait is &lt;b&gt;90 seconds&lt;/b&gt;, so there is time to answer. In the game, each ping you take lifts your place in line (+0.08) and each miss lowers it (-0.12). A lower place means fewer pings come.&lt;/p&gt;&#x27;
+      : i === 1
+      ? &#x27;&lt;p&gt;12 Aug: the ping wait is cut to &lt;b&gt;60 seconds&lt;/b&gt;. The pings fall faster. Same rules: +0.08 for a take, -0.12 for a miss, and a lower place means fewer pings.&lt;/p&gt;&#x27;
+      : &#x27;&lt;p&gt;The proposal: the same 60 seconds, but a miss costs &lt;b&gt;half as much&lt;/b&gt; (-0.06) and your place &lt;b&gt;drifts back toward neutral&lt;/b&gt; over time.&lt;/p&gt;&#x27; +
+        &#x27;&lt;div class=&quot;say&quot;&gt;&lt;b&gt;WHAT KIP WOULD SEE ON METEOR MITE\&#x27;S CARD&lt;/b&gt;Quiet since 12 Aug. Pings a week: 11 before, 1 now. The ping wait was cut from 90 to 60 seconds that day. We are checking if that is why. Meteor Mite is still on the list. Misses now count less against ranking.&lt;/div&gt;&#x27; +
+        &#x27;&lt;div class=&quot;say&quot;&gt;&lt;b&gt;WHAT METEOR MITE WOULD SEE ON THEIR PHONE&lt;/b&gt;We see you are getting fewer pings since 12 Aug. We are checking why. You are still on the list. Missed pings now count less against your place, and it recovers over time.&lt;/div&gt;&#x27; +
+        &#x27;&lt;p&gt;You start where World 1-2 left you.&lt;/p&gt;&#x27;;
+    card(&#x27;&lt;h2&gt;WORLD &#x27; + w.id + &#x27;: &#x27; + w.title + &#x27;&lt;/h2&gt;&#x27; + rules + &#x27;&lt;p&gt;Move: arrow keys, A and D, the on-screen buttons, or point at the screen.&lt;/p&gt;&#x27;,
+      [{ label: &#x27;START&#x27;, fn: function () { startRound(i); } }]);
+  }
+  function showClear(i) {
+    var r = results[i], pct = Math.round(r.end * 100);
+    var played = &#x27;&lt;p&gt;&lt;b&gt;You&#x27; + (r.skipped ? &#x27; (round skipped early)&#x27; : &#x27;&#x27;) + &#x27;:&lt;/b&gt; offered &#x27; + r.offered + (r.offered === 1 ? &#x27; ping&#x27; : &#x27; pings&#x27;) + &#x27;, took &#x27; + r.taken + &#x27;, missed &#x27; + r.missed + &#x27;. Place in line: &#x27; + pct + &#x27;%.&lt;/p&gt;&#x27;;
+    var html, loop = &#x27;&lt;p&gt;In the game, every miss lowers your place in line, and a lower place means fewer pings.&lt;/p&gt;&#x27;;
+    if (i === 0) {
+      html = &#x27;&lt;h2&gt;WORLD 1-1 CLEAR: BEFORE 4.2&lt;/h2&gt;&#x27; + played +
+        &#x27;&lt;h3&gt;WHAT THE DATA SAYS&lt;/h3&gt;&lt;ul&gt;&lt;li&gt;Meteor Mite got 10 to 12 pings a week.&lt;/li&gt;&lt;li&gt;The four who later went quiet missed 1 to 4% of their pings.&lt;/li&gt;&lt;li&gt;Acceptance held at 75 to 78% for six weeks.&lt;/li&gt;&lt;/ul&gt;&#x27; +
+        qb(&#x27;Hit the block: tickets about quiet responders.&#x27;, &#x27;Before 12 Aug there were 0 tickets about quiet responders.&#x27;);
+    } else if (i === 1) {
+      html = &#x27;&lt;h2&gt;WORLD 1-2 CLEAR: AFTER 4.2&lt;/h2&gt;&#x27; + played + loop +
+        &#x27;&lt;h3&gt;WHAT THE DATA SAYS&lt;/h3&gt;&lt;ul&gt;&lt;li&gt;12 Aug: ping wait cut from 90 to 60 seconds.&lt;/li&gt;&lt;li&gt;Meteor Mite pings a week: 7 (part week), then 4, 2, 1.&lt;/li&gt;&lt;li&gt;The four quiet responders now miss 53 to 64% of pings (1 to 4% before).&lt;/li&gt;&lt;li&gt;Tickets about quiet responders: 0 before, 30 after.&lt;/li&gt;&lt;li&gt;The Gale, on the same desk, went from about 13 to 21 pings a week.&lt;/li&gt;&lt;/ul&gt;&#x27; +
+        qb(&#x27;Hit the block: what Kip says.&#x27;, &#x27;Kip, 4 Sep: all he can say to Meteor Mite is &quot;hang in there,&quot; and &quot;I don\&#x27;t have anything better than that.&quot;&#x27;) +
+        qb(&#x27;Hit the block: what we have not proven.&#x27;, &#x27;The 60 second wait likely started the misses, and the code never forgives a miss. This is not proven yet.&#x27;);
+    } else {
+      html = &#x27;&lt;h2&gt;WORLD 1-3 CLEAR: THE FIX&lt;/h2&gt;&#x27; + played +
+        &#x27;&lt;p&gt;In the game, misses cost half as much and your place drifts back, so pings keep coming.&lt;/p&gt;&#x27; +
+        &#x27;&lt;h3&gt;THE PROPOSAL&lt;/h3&gt;&lt;ul&gt;&lt;li&gt;Words for Kip and for Meteor Mite, so neither is left guessing.&lt;/li&gt;&lt;li&gt;A recovery rule in &lt;b&gt;history.py&lt;/b&gt;: a miss costs half as much as a &quot;no&quot;, and scores drift toward neutral. Wen Li and Marcus Oyelaran set the size and the time.&lt;/li&gt;&lt;li&gt;Try it on the four quiet responders for four weeks, against the other 12.&lt;/li&gt;&lt;li&gt;Roll back if callouts nobody took stay above 11.1% two weeks in a row.&lt;/li&gt;&lt;/ul&gt;&#x27; +
+        qb(&#x27;Hit the block: who may lose pings.&#x27;, &#x27;The Gale and the busiest responders may lose pings.&#x27;) +
+        qb(&#x27;Hit the block: what we do not know yet.&#x27;, &#x27;Can the phone show a message? Marcus Oyelaran has to confirm. Rook Supply has not been asked about the availability record.&#x27;);
+    }
+    card(html, [i === 0 ? { label: &#x27;NEXT WORLD&#x27;, fn: function () { showIntro(1); } } : i === 1 ? { label: &#x27;WARP: WHAT THEY SEE TODAY&#x27;, fn: function () { showScreens(&#x27;today&#x27;, function () { showIntro(2); }); } } : { label: &#x27;WARP: WHAT THEY WOULD SEE WITH THE FIX&#x27;, fn: function () { showScreens(&#x27;fix&#x27;, showFinal); } },
+                { label: &#x27;PLAY THIS WORLD AGAIN&#x27;, alt: true, fn: function () { startRound(i); } }]);
+  }
+  function showFinal() {
+    screen = &#x27;final&#x27;;
+    card(&#x27;&lt;h2&gt;COURSE CLEAR&lt;/h2&gt;&lt;p&gt;Helen, these three blocks are yours.&lt;/p&gt;&#x27; +
+      qb(&#x27;Go ahead with this plan, to take to engineering?&#x27;, &#x27;My suggestion: yes.&#x27;) +
+      qb(&#x27;Try it on the four quiet responders first, once engineering says it is safe?&#x27;, &#x27;My suggestion: yes, with the stop rule.&#x27;) +
+      qb(&#x27;Does this replace a Q3 commitment?&#x27;, &#x27;Please tell me. The Q3 list is not agreed yet.&#x27;) +
+      &#x27;&lt;h3&gt;HOW WE WILL KNOW IT WORKED (WEEK 4)&lt;/h3&gt;&lt;ul&gt;&lt;li&gt;Each of the four gets 8 or more pings a week (today 3 to 4; Meteor Mite 1).&lt;/li&gt;&lt;li&gt;25% or less of their pings missed (today 53 to 64%).&lt;/li&gt;&lt;li&gt;2 or fewer &quot;gone quiet&quot; tickets a week.&lt;/li&gt;&lt;li&gt;The Gale, overall acceptance and callouts nobody took must not get worse.&lt;/li&gt;&lt;/ul&gt;&#x27; +
+      &#x27;&lt;h3&gt;STILL OPEN&lt;/h3&gt;&lt;ul&gt;&lt;li&gt;Why the ping wait was cut, ranking scores over time: Marcus Oyelaran.&lt;/li&gt;&lt;li&gt;Size and time of the recovery rule: Wen Li and Marcus Oyelaran.&lt;/li&gt;&lt;li&gt;Numbers after 6 Sep: Ravi Menon.&lt;/li&gt;&lt;/ul&gt;&#x27;,
+      [{ label: &#x27;PLAY AGAIN&#x27;, fn: function () { results = []; showTitle(); } }]);
+  }
+
+  /* warp zone: the screens Kip and Meteor Mite would see */
+  var WEEKS = [&#x27;29 Jun&#x27;,&#x27;6 Jul&#x27;,&#x27;13 Jul&#x27;,&#x27;20 Jul&#x27;,&#x27;27 Jul&#x27;,&#x27;3 Aug&#x27;,&#x27;10 Aug&#x27;,&#x27;17 Aug&#x27;,&#x27;24 Aug&#x27;,&#x27;31 Aug&#x27;];
+  var MM = { p: [11,12,10,11,12,11,7,4,2,1], t: [7,9,6,7,9,8,2,1,0,0] };
+  var GALE = [13,12,13,14,13,13,11,17,20,21];
+  var sIdx = 9, sMode = &#x27;today&#x27;, sNext = null, sTimer = null, sThread = false, sOpen = false;
+  function barsHtml(vals, max) {
+    return vals.map(function (v, i) {
+      return &#x27;&lt;span class=&quot;&#x27; + (i &gt;= 6 ? &#x27;now&#x27; : &#x27;&#x27;) + (i &gt; sIdx ? &#x27; future&#x27; : &#x27;&#x27;) + (i === sIdx ? &#x27; sel&#x27; : &#x27;&#x27;) + &#x27;&quot; style=&quot;height:&#x27; + Math.max(8, Math.round(v / max * 100)) + &#x27;%&quot; title=&quot;Week of &#x27; + WEEKS[i] + &#x27;: &#x27; + v + &#x27; pings&quot;&gt;&lt;/span&gt;&#x27;;
+    }).join(&#x27;&#x27;);
+  }
+  function plural(n) { return n === 1 ? &#x27;ping&#x27; : &#x27;pings&#x27;; }
+  function renderScreens() {
+    var quiet = sIdx &gt;= 7, fix = sMode === &#x27;fix&#x27;, p = MM.p[sIdx], t = MM.t[sIdx], gl = GALE[sIdx];
+    $(&#x27;sweek&#x27;).textContent = WEEKS[sIdx];
+    $(&#x27;sslider&#x27;).value = sIdx;
+    Array.prototype.forEach.call(document.querySelectorAll(&#x27;#mode button&#x27;), function (b) { b.setAttribute(&#x27;aria-pressed&#x27;, String(b.dataset.m === sMode)); });
+    var mmCard = &#x27;&lt;div class=&quot;acard&quot;&gt;&lt;h4&gt;Meteor Mite &lt;span&gt;Eastgate&lt;/span&gt;&lt;/h4&gt;&#x27; +
+      (quiet &amp;&amp; fix ? &#x27;&lt;span class=&quot;atag&quot;&gt;Quiet since 12 Aug&lt;/span&gt;&#x27; : &#x27;&#x27;) +
+      &#x27;&lt;div class=&quot;abig&quot;&gt;&#x27; + p + &#x27; &lt;small&gt;&#x27; + plural(p) + &#x27; this week · &#x27; + t + &#x27; taken&#x27; + (sIdx &gt;= 6 ? &#x27; · 11 a week before&#x27; : &#x27;&#x27;) + &#x27;&lt;/small&gt;&lt;/div&gt;&#x27; +
+      &#x27;&lt;div class=&quot;abars&quot;&gt;&#x27; + barsHtml(MM.p, 12) + &#x27;&lt;/div&gt;&lt;div class=&quot;aaxis&quot;&gt;&lt;span&gt;29 Jun&lt;/span&gt;&lt;span&gt;12 Aug&lt;/span&gt;&lt;span&gt;31 Aug&lt;/span&gt;&lt;/div&gt;&#x27; +
+      (quiet &amp;&amp; fix ? &#x27;&lt;div class=&quot;anote&quot;&gt;&lt;b&gt;Quiet since 12 Aug.&lt;/b&gt; Pings a week: 11 before, &#x27; + p + &#x27; now. The ping wait was cut from 90 to 60 seconds that day. We are checking if that is why. Meteor Mite is still on the list. Misses now count less against ranking.&lt;/div&gt;&#x27; : &#x27;&#x27;) +
+      (quiet &amp;&amp; !fix ? &#x27;&lt;div class=&quot;anone&quot;&gt;Nothing on the card says why.&lt;/div&gt;&#x27; : &#x27;&#x27;) + &#x27;&lt;/div&gt;&#x27;;
+    var gCard = &#x27;&lt;div class=&quot;acard&quot;&gt;&lt;h4&gt;The Gale &lt;span&gt;Eastgate&lt;/span&gt;&lt;/h4&gt;&#x27; +
+      &#x27;&lt;div class=&quot;abig&quot;&gt;&#x27; + gl + &#x27; &lt;small&gt;pings this week&#x27; + (sIdx &gt;= 7 ? &#x27; · 13 a week before&#x27; : &#x27;&#x27;) + &#x27;&lt;/small&gt;&lt;/div&gt;&#x27; +
+      &#x27;&lt;div class=&quot;abars&quot;&gt;&#x27; + barsHtml(GALE, 21) + &#x27;&lt;/div&gt;&lt;div class=&quot;aaxis&quot;&gt;&lt;span&gt;29 Jun&lt;/span&gt;&lt;span&gt;12 Aug&lt;/span&gt;&lt;span&gt;31 Aug&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&#x27;;
+    var bubble = quiet ? (fix
+      ? &#x27;&lt;div class=&quot;bubble ok&quot;&gt;Intent: Kip can tell Meteor Mite what is true. Still on the list, and we are checking why.&lt;/div&gt;&#x27;
+      : &#x27;&lt;div class=&quot;bubble&quot;&gt;Kip, 4 Sep: two cards on one screen &quot;might as well be two different products.&quot; All he can say is &quot;hang in there,&quot; and &quot;I don\&#x27;t have anything better than that.&quot;&lt;/div&gt;&#x27;) : &#x27;&#x27;;
+    $(&#x27;sconsole&#x27;).innerHTML = &#x27;&lt;div class=&quot;app&quot;&gt;&lt;div class=&quot;apptop&quot;&gt;&lt;span&gt;ROOK &amp;middot; Dispatch &amp;middot; Coverage&lt;/span&gt;&lt;span&gt;Kip &amp;middot; Handler&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;appbody&quot;&gt;&lt;div class=&quot;acards&quot;&gt;&#x27; + mmCard + gCard + &#x27;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&#x27; + bubble;
+
+    var ph = &#x27;&lt;div class=&quot;pphone&quot;&gt;&lt;div class=&quot;ptime&quot;&gt;9:41&lt;/div&gt;&#x27;;
+    if (sIdx &lt;= 5) ph += &#x27;&lt;div class=&quot;pnotif&quot; style=&quot;cursor:default&quot;&gt;&lt;b&gt;Rook Dispatch&lt;/b&gt;New callout ping. You have 90 seconds to answer.&lt;/div&gt;&#x27;;
+    else if (sIdx === 6) ph += &#x27;&lt;div class=&quot;pnotif&quot; style=&quot;cursor:default&quot;&gt;&lt;b&gt;Rook Dispatch&lt;/b&gt;New callout ping. You have 60 seconds to answer.&lt;/div&gt;&#x27;;
+    else if (fix) {
+      ph += sOpen
+        ? &#x27;&lt;button class=&quot;pbtn&quot; data-a=&quot;back&quot; style=&quot;margin:0 0 8px&quot;&gt;&amp;lsaquo; BACK&lt;/button&gt;&lt;div class=&quot;pmsg&quot;&gt;&lt;b&gt;Rook Dispatch&lt;/b&gt;We see you are getting fewer pings since 12 Aug. We are checking why. You are still on the list. Missed pings now count less against your place, and it recovers over time.&lt;/div&gt;&#x27;
+        : &#x27;&lt;button class=&quot;pnotif&quot; data-a=&quot;open&quot;&gt;&lt;b&gt;Rook Dispatch&lt;/b&gt;We see you are getting fewer pings since 12 Aug. Tap to read.&lt;/button&gt;&#x27;;
+    } else if (sThread) {
+      ph += &#x27;&lt;button class=&quot;pbtn&quot; data-a=&quot;back&quot; style=&quot;margin:0 0 8px&quot;&gt;&amp;lsaquo; BACK&lt;/button&gt;&lt;div class=&quot;pmsg me&quot;&gt;&lt;b&gt;Meteor Mite&lt;/b&gt;Is something broken? It is so quiet.&lt;/div&gt;&lt;div class=&quot;pmsg kip&quot;&gt;&lt;b&gt;Kip&lt;/b&gt;Hang in there, it\&#x27;ll pick up.&lt;/div&gt;&#x27;;
+    } else {
+      ph += &#x27;&lt;div class=&quot;pempty&quot;&gt;No pings.&lt;br&gt;No message from Rook.&lt;/div&gt;&#x27;;
+    }
+    ph += &#x27;&lt;/div&gt;&#x27;;
+    if (quiet &amp;&amp; !fix &amp;&amp; !sThread) ph += &#x27;&lt;button class=&quot;pbtn&quot; data-a=&quot;thread&quot;&gt;TEXT KIP&lt;/button&gt;&#x27;;
+    $(&#x27;sphone&#x27;).innerHTML = ph;
+
+    var cap;
+    if (sIdx &lt;= 5) cap = &#x27;Before 4.2. Meteor Mite gets 10 to 12 pings a week and Kip\&#x27;s two cards look alike.&#x27;;
+    else if (sIdx === 6) cap = &#x27;12 Aug: 4.2 ships. The ping wait drops from 90 to 60 seconds. This week shows only the days after the release.&#x27;;
+    else if (!fix) cap = &#x27;After 4.2, today. Meteor Mite gets &#x27; + p + &#x27; &#x27; + plural(p) + &#x27; this week. Kip sees two cards that tell different stories and nothing that says why. Meteor Mite sees a silent phone and texts Kip.&lt;small&gt;Mock based on Kip\&#x27;s 4 Sep description and the callout history. The real console and phone may look different. The text message wording is paraphrased.&lt;/small&gt;&#x27;;
+    else cap = &#x27;With our fix. Kip\&#x27;s card says what happened and Meteor Mite is told the same thing, so neither is left guessing.&lt;small&gt;Wording is proposed, not live. The phone message needs engineering to confirm it can be shown.&lt;/small&gt;&#x27;;
+    $(&#x27;scap&#x27;).innerHTML = cap;
+  }
+  function showScreens(mode, next) {
+    screen = &#x27;screens&#x27;; sMode = mode; sNext = next; sIdx = 9; sThread = false; sOpen = false;
+    $(&#x27;frame&#x27;).classList.add(&#x27;hidden&#x27;); $(&#x27;pad&#x27;).classList.add(&#x27;hidden&#x27;); $(&#x27;screens&#x27;).classList.remove(&#x27;hidden&#x27;);
+    renderScreens(); $(&#x27;screens&#x27;).scrollIntoView({ block: &#x27;start&#x27; });
+  }
+  function leaveScreens() {
+    if (sTimer) { clearInterval(sTimer); sTimer = null; }
+    $(&#x27;screens&#x27;).classList.add(&#x27;hidden&#x27;); $(&#x27;frame&#x27;).classList.remove(&#x27;hidden&#x27;); $(&#x27;pad&#x27;).classList.remove(&#x27;hidden&#x27;);
+    var n = sNext; sNext = null; if (n) n();
+  }
+  $(&#x27;snext&#x27;).onclick = leaveScreens;
+  $(&#x27;sslider&#x27;).oninput = function () { if (sTimer) { clearInterval(sTimer); sTimer = null; } sIdx = +this.value; sThread = false; sOpen = false; renderScreens(); };
+  $(&#x27;mode&#x27;).onclick = function (e) { var b = e.target.closest(&#x27;button&#x27;); if (!b) return; sMode = b.dataset.m; sThread = false; sOpen = false; renderScreens(); };
+  $(&#x27;splay&#x27;).onclick = function () {
+    if (sTimer) { clearInterval(sTimer); sTimer = null; return; }
+    sIdx = 0; sThread = false; sOpen = false; renderScreens();
+    sTimer = setInterval(function () { if (sIdx &gt;= 9) { clearInterval(sTimer); sTimer = null; return; } sIdx += 1; renderScreens(); }, 1100);
+  };
+  $(&#x27;sphone&#x27;).onclick = function (e) {
+    var b = e.target.closest(&#x27;[data-a]&#x27;); if (!b) return; var a = b.dataset.a;
+    if (a === &#x27;open&#x27;) sOpen = true; else if (a === &#x27;back&#x27;) { sOpen = false; sThread = false; } else if (a === &#x27;thread&#x27;) sThread = true;
+    beep(660, 0.06); renderScreens();
+  };
+
+  /* input */
+  var KEYMAP = { ArrowLeft: &#x27;left&#x27;, a: &#x27;left&#x27;, A: &#x27;left&#x27;, ArrowRight: &#x27;right&#x27;, d: &#x27;right&#x27;, D: &#x27;right&#x27; };
+  window.addEventListener(&#x27;keydown&#x27;, function (e) {
+    var k = KEYMAP[e.key];
+    if (k &amp;&amp; g) { g.keys[k] = true; e.preventDefault(); }
+  });
+  window.addEventListener(&#x27;keyup&#x27;, function (e) { var k = KEYMAP[e.key]; if (k &amp;&amp; g) g.keys[k] = false; });
+  function hold(id, dirName) {
+    var b = $(id);
+    function down(e) { if (g) g.keys[dirName] = true; e.preventDefault(); }
+    function up() { if (g) g.keys[dirName] = false; }
+    b.addEventListener(&#x27;pointerdown&#x27;, down); b.addEventListener(&#x27;pointerup&#x27;, up); b.addEventListener(&#x27;pointerleave&#x27;, up); b.addEventListener(&#x27;pointercancel&#x27;, up);
+  }
+  hold(&#x27;left&#x27;, &#x27;left&#x27;); hold(&#x27;right&#x27;, &#x27;right&#x27;);
+  function aim(e) { if (g &amp;&amp; screen === &#x27;play&#x27;) { var r = cv.getBoundingClientRect(); g.target = (e.clientX - r.left) / r.width * W; } }
+  cv.addEventListener(&#x27;pointermove&#x27;, aim); cv.addEventListener(&#x27;pointerdown&#x27;, aim);
+  $(&#x27;skip&#x27;).onclick = function () { if (screen === &#x27;play&#x27; &amp;&amp; g) { g.skipped = g.t &lt; g.dur - 1; g.t = g.dur; } };
+  $(&#x27;mute&#x27;).onclick = function () { muted = !muted; this.textContent = &#x27;Sound: &#x27; + (muted ? &#x27;off&#x27; : &#x27;on&#x27;); };
+
+  window.__game = { step: step, state: function () { return { screen: screen, world: wi, g: g, results: results }; } };
+  showTitle();
+  requestAnimationFrame(frame);
+})();
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+" loading="lazy"></iframe>
   </div>
-  <p class="proto-note">Mock for Helen Achebe. Wording is from the brief and numbers are from the callout history. Nothing here is built or shipped, and we do not know yet if the phone can show a message.</p>
+  <p class="proto-note">The game is an illustration, not Rook's real ranking. The numbers on the clear and warp screens come from the callout history, and the wording is proposed, not live. We do not know yet if the phone can show a message.</p>
 
   <div class="grid2" style="margin-top:34px">
     <div class="card sim">
@@ -358,8 +805,9 @@
   <div class="mod">
     <div><div class="badge">MODULE 5</div><h3>Super Speed</h3><div class="power">From insight to a prototype in one sitting.</div></div>
     <div>
-      <div class="find"><span class="lab">Artifact</span><p>The clickable prototype in the section above: Meteor Mite's week replay, the "why" panel, and the phone preview. Helen Achebe asked for a one-pager from the point of view of the person it happens to, so I built one proposal, not two options. Three AI "Helens" (Opus, Sonnet, Haiku) reviewed the brief and asked for exact words, honest wording while the cause is unproven, and guardrails with a stop rule.</p></div>
+      <div class="find"><span class="lab">Artifact</span><p>The playable prototype in the section above, which grew from a clickable console into a pixel-art game: three worlds (before 4.2, after 4.2, the fix), then warp zones showing Kip's console and Meteor Mite's phone today versus with the fix. Helen Achebe asked for a one-pager from the point of view of the person it happens to, so I built one proposal, not two options. Three AI Helens (Opus, Sonnet, Haiku) reviewed the brief and asked for exact words, honest wording while the cause is unproven, and guardrails with a stop rule.</p></div>
       <div class="prompt"><span class="lab">My prompt (#11)</span>Show me this happening to Meteor Mite specifically, using her name, the way Kip would see it.</div>
+      <p class="why-this">This prompt started the prototype. The game version came from later edits that are not in prompts.md.</p>
     </div>
   </div>
 
@@ -423,87 +871,13 @@
 
 <footer><div class="wrap">Final report · Product School "Claude Code for PMs" (cohort ccpm-2026.1). Rook Industries is fictional; nothing here is a fact about the world. Built with Claude Code from CLAUDE.md, the six prompts.md files, <code>05-super-speed/prototype.html</code> and the <code>review-checklist</code> skill.</div></footer>
 
-<div class="overlay hidden" id="overlay">
-  <div class="modal" role="dialog" aria-label="What Meteor Mite sees on their phone">
-    <h3>What Meteor Mite sees</h3>
-    <div class="small">Mock of the phone message. We do not know yet if the phone can show it.</div>
-    <div class="phone">
-      <div id="lock">
-        <div class="time">9:41</div><div class="date">Lock screen</div>
-        <button class="notif" id="notif"><b>Rook Dispatch</b>We see you are getting fewer pings since 12 Aug. Tap to read.</button>
-      </div>
-      <div id="read" class="hidden">
-        <button class="backb" id="back">‹ Back</button>
-        <div class="msg">
-          <p>We see you are getting fewer pings since 12 Aug. We are checking why. You are still on the list.</p>
-          <p class="added">Missed pings now count less against your place, and it recovers over time.</p>
-        </div>
-      </div>
-    </div>
-    <button class="btn light" id="close">Close</button>
-  </div>
-</div>
-
 <script>
 (function(){
   function $(id){return document.getElementById(id)}
-  var idx=9,noteOpen=true,timer=null;
-  var WEEKS=["29 Jun","6 Jul","13 Jul","20 Jul","27 Jul","3 Aug","10 Aug","17 Aug","24 Aug","31 Aug"];
-  var MM={p:[11,12,10,11,12,11,7,4,2,1],t:[7,9,6,7,9,8,2,1,0,0]};
-  var GALE=[13,12,13,14,13,13,11,17,20,21];
-  function bars(el,vals,max){
-    el.innerHTML="";
-    vals.forEach(function(v,i){
-      var b=document.createElement("span");
-      b.style.height=Math.max(8,Math.round(v/max*100))+"%";
-      var c=[]; if(i>=6)c.push("now"); if(i>idx)c.push("future"); if(i===idx)c.push("sel");
-      b.className=c.join(" ");
-      b.title="Week of "+WEEKS[i]+": "+v+" pings";
-      el.appendChild(b);
-    });
-  }
-  function render(){
-    var quiet=idx>=7,release=idx===6,p=MM.p[idx],t=MM.t[idx];
-    $("weeklabel").textContent=WEEKS[idx];$("crumbweek").textContent=WEEKS[idx];
-    $("weekmark").textContent=release?"4.2 shipped Wed 12 Aug":(idx>6?"After 4.2":"Before 4.2");
-    var tag=$("mmtag");
-    tag.className="tag "+(quiet?"quiet":release?"watch":"neutral");
-    tag.textContent=quiet?"Quiet since 12 Aug":release?"4.2 shipped 12 Aug":"Normal week";
-    $("mmbig").textContent=p;
-    $("mmsmall").textContent=(p===1?"ping":"pings")+" this week · "+t+" taken"+(idx>=6?" · 11 a week before":"");
-    bars($("mmbars"),MM.p,12);
-    var open=quiet&&noteOpen;
-    $("whybox").classList.toggle("hidden",!open);
-    $("why").setAttribute("aria-expanded",String(open));
-    $("why").disabled=!quiet;$("why").style.opacity=quiet?"1":".45";
-    var g=GALE[idx];
-    $("gtag").textContent=idx>=7?"Busier than before":"Normal week";
-    $("gtag").className="tag "+(idx>=7?"busy":"neutral");
-    $("gbig").textContent=g;
-    $("gsmall").textContent="pings this week"+(idx>=7?" · 13 a week before":"");
-    bars($("gbars"),GALE,21);
-    $("nownum").textContent=p;
-    $("ghint").textContent=quiet?"Same area, same week. The two cards are the story Kip could not explain.":"Same area, steady weeks for both responders.";
-    $("week").value=idx;
-  }
-  function stop(){if(timer){clearInterval(timer);timer=null;$("play").innerHTML="&#9654; Replay Meteor Mite"}}
-  $("week").oninput=function(){stop();idx=+this.value;if(idx>=7)noteOpen=true;render()};
-  $("play").onclick=function(){
-    if(timer){stop();return}
-    idx=0;noteOpen=false;render();
-    $("play").innerHTML="&#10074;&#10074; Pause";
-    timer=setInterval(function(){
-      if(idx>=9){stop();return}
-      idx+=1;if(idx===7)noteOpen=true;render();
-    },1100);
+  $("fullscr").onclick=function(){
+    var u=URL.createObjectURL(new Blob([$("game").srcdoc],{type:"text/html"}));
+    window.open(u,"_blank");
   };
-  $("why").onclick=function(){noteOpen=!noteOpen;render()};
-  $("preview").onclick=function(){$("lock").classList.remove("hidden");$("read").classList.add("hidden");$("overlay").classList.remove("hidden")};
-  $("notif").onclick=function(){$("lock").classList.add("hidden");$("read").classList.remove("hidden")};
-  $("back").onclick=function(){$("read").classList.add("hidden");$("lock").classList.remove("hidden")};
-  $("close").onclick=function(){$("overlay").classList.add("hidden")};
-  $("overlay").onclick=function(e){if(e.target===this)this.classList.add("hidden")};
-  render();
 
   // Score illustration: net change per ping. Non-yes pings assumed 80% missed / 20% turned down.
   function net(y,missCost){return 0.08*y-(1-y)*(0.8*missCost+0.2*0.12)}
