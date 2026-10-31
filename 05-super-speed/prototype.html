@@ -77,6 +77,14 @@
   .why .small { font-size: 12px; color: var(--muted); margin-top: 8px; }
   .hint { color: var(--muted); font-size: 13px; margin: 8px 0 0; }
 
+  .replay { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; }
+  .replay input { flex: 1; min-width: 160px; accent-color: var(--accent); }
+  .rlabel { font-size: 13px; color: var(--muted); }
+  .tag.neutral { background: var(--ok-soft); color: var(--ok); }
+  .tag.watch { background: var(--accent-soft); color: var(--accent); }
+  .bars span { transition: height .25s; }
+  .bars span.future { opacity: .18; }
+  .bars span.sel { outline: 2px solid var(--ink); outline-offset: 1px; }
   .note { margin-top: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; font-size: 14px; }
   .note b { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: 4px; }
 
@@ -119,7 +127,7 @@
       <div class="titlerow">
         <div>
           <h1>Coverage</h1>
-          <div class="crumb">Your responders · week of 31 Aug</div>
+          <div class="crumb">Your responders · week of <span id="crumbweek">31 Aug</span></div>
         </div>
         <div class="switch" id="opt" role="group" aria-label="Which option to show">
           <button data-o="1" aria-pressed="true">Option 1: words only</button>
@@ -128,30 +136,32 @@
       </div>
       <div class="proto">Prototype for Helen Achebe. Wording is from brief.md and the numbers are from the callout history. Nothing here is built or shipped.</div>
 
+      <div class="replay">
+        <button class="btn" id="play">&#9654; Replay Meteor Mite</button>
+        <label for="week" class="rlabel">Week of <b id="weeklabel">31 Aug</b></label>
+        <input type="range" id="week" min="0" max="9" value="9" aria-label="Week to show">
+        <span class="rlabel" id="weekmark"></span>
+      </div>
+
       <div class="summary">
         <div class="stat"><b>2</b><span>responders on your desk</span></div>
-        <div class="stat"><b>22</b><span>pings this week across both</span></div>
-        <div class="stat"><b>1</b><span>responder gone quiet</span></div>
+        <div class="stat"><b id="stat2">22</b><span>pings this week across both</span></div>
+        <div class="stat"><b id="stat3">1</b><span>responder gone quiet</span></div>
       </div>
 
       <div class="cards">
         <section class="card" aria-label="Meteor Mite">
           <div class="head"><h2>Meteor Mite</h2><span class="area">Eastgate</span></div>
-          <span class="tag quiet">Quiet since 12 Aug</span>
-          <div class="big">1 <small>ping this week · 11 a week before</small></div>
-          <div class="bars" aria-label="Pings per week, 29 Jun to 31 Aug">
-            <span style="height:92%"></span><span style="height:100%"></span><span style="height:83%"></span>
-            <span style="height:92%"></span><span style="height:100%"></span><span style="height:92%"></span>
-            <span class="now" style="height:58%"></span><span class="now" style="height:33%"></span>
-            <span class="now" style="height:17%"></span><span class="now" style="height:8%"></span>
-          </div>
+          <span class="tag" id="mmtag"></span>
+          <div class="big"><span id="mmbig"></span> <small id="mmsmall"></small></div>
+          <div class="bars" id="mmbars" aria-label="Pings per week for Meteor Mite"></div>
           <div class="axis"><span>29 Jun</span><span>12 Aug</span><span>31 Aug</span></div>
           <div class="actions">
             <button class="btn" id="why" aria-expanded="false" aria-controls="whybox">Why is this?</button>
             <button class="btn" id="preview">What Meteor Mite sees</button>
           </div>
           <div class="why hidden" id="whybox">
-            <p><b>Quiet since 12 Aug.</b> Pings a week: 11 before, 1 now. The ping wait was cut from 90 to 60 seconds that day. We are checking if that is why. Meteor Mite is still on the list.</p>
+            <p><b>Quiet since 12 Aug.</b> Pings a week: 11 before, <span id="nownum">1</span> now. The ping wait was cut from 90 to 60 seconds that day. We are checking if that is why. Meteor Mite is still on the list.</p>
             <p class="added hidden" id="added1">Misses now count less against ranking.</p>
             <div class="small">We have not proven the cause yet.</div>
           </div>
@@ -159,16 +169,11 @@
 
         <section class="card" aria-label="The Gale">
           <div class="head"><h2>The Gale</h2><span class="area">Eastgate</span></div>
-          <span class="tag busy">Busier than before</span>
-          <div class="big">21 <small>pings this week · 13 a week before</small></div>
-          <div class="bars" aria-label="Pings per week, 29 Jun to 31 Aug">
-            <span style="height:62%"></span><span style="height:57%"></span><span style="height:62%"></span>
-            <span style="height:67%"></span><span style="height:62%"></span><span style="height:62%"></span>
-            <span class="now" style="height:52%"></span><span class="now" style="height:81%"></span>
-            <span class="now" style="height:95%"></span><span class="now" style="height:100%"></span>
-          </div>
+          <span class="tag busy" id="gtag"></span>
+          <div class="big"><span id="gbig"></span> <small id="gsmall"></small></div>
+          <div class="bars" id="gbars" aria-label="Pings per week for The Gale"></div>
           <div class="axis"><span>29 Jun</span><span>12 Aug</span><span>31 Aug</span></div>
-          <p class="hint" style="margin:0">Same area, same week. The two cards are the story Kip could not explain.</p>
+          <p class="hint" style="margin:0" id="ghint"></p>
         </section>
       </div>
 
@@ -199,10 +204,55 @@
   </div>
 
 <script>
-  var opt = 1;
+  var opt = 1, idx = 9, noteOpen = false, timer = null;
+  var WEEKS = ["29 Jun","6 Jul","13 Jul","20 Jul","27 Jul","3 Aug","10 Aug","17 Aug","24 Aug","31 Aug"];
+  // Pings per week and pings taken, from the callout history. The 10 Aug week shows only its days after 12 Aug.
+  var MM = { p: [11,12,10,11,12,11,7,4,2,1], t: [7,9,6,7,9,8,2,1,0,0] };
+  var GALE = [13,12,13,14,13,13,11,17,20,21];
   function $(id) { return document.getElementById(id); }
+  function bars(el, vals, max) {
+    el.innerHTML = "";
+    vals.forEach(function (v, i) {
+      var b = document.createElement("span");
+      b.style.height = Math.max(8, Math.round(v / max * 100)) + "%";
+      if (i >= 6) b.className = "now";
+      if (i > idx) b.className += " future";
+      if (i === idx) b.className += " sel";
+      b.title = "Week of " + WEEKS[i] + ": " + v + " pings";
+      el.appendChild(b);
+    });
+  }
   function render() {
-    var two = opt === 2;
+    var two = opt === 2, quiet = idx >= 7, release = idx === 6;
+    var p = MM.p[idx], t = MM.t[idx];
+    $("weeklabel").textContent = WEEKS[idx];
+    $("crumbweek").textContent = WEEKS[idx];
+    $("weekmark").textContent = release ? "4.2 shipped Wed 12 Aug" : (idx > 6 ? "After 4.2" : "Before 4.2");
+    // Meteor Mite
+    var tag = $("mmtag");
+    tag.className = "tag " + (quiet ? "quiet" : release ? "watch" : "neutral");
+    tag.textContent = quiet ? "Quiet since 12 Aug" : release ? "4.2 shipped 12 Aug" : "Normal week";
+    $("mmbig").textContent = p;
+    $("mmsmall").textContent = (p === 1 ? "ping" : "pings") + " this week · " + t + " taken" + (idx >= 6 ? " · 11 a week before" : "");
+    bars($("mmbars"), MM.p, 12);
+    var open = quiet && noteOpen;
+    $("whybox").classList.toggle("hidden", !open);
+    $("why").setAttribute("aria-expanded", String(open));
+    $("why").disabled = !quiet;
+    $("why").style.opacity = quiet ? "1" : ".45";
+    // Gale
+    var g = GALE[idx];
+    $("gtag").textContent = idx >= 7 ? "Busier than before" : "Normal week";
+    $("gtag").className = "tag " + (idx >= 7 ? "busy" : "neutral");
+    $("gbig").textContent = g;
+    $("gsmall").textContent = "pings this week" + (idx >= 7 ? " · 13 a week before" : "");
+    bars($("gbars"), GALE, 21);
+    $("nownum").textContent = p;
+    $("ghint").textContent = quiet ? "Same area, same week. The two cards are the story Kip could not explain." : "Same area, steady weeks for both responders.";
+    // summary
+    $("stat2").textContent = p + g;
+    $("stat3").textContent = quiet ? 1 : 0;
+    // option text
     $("added1").classList.toggle("hidden", !two);
     $("added2").classList.toggle("hidden", !two);
     $("notehead").textContent = "What changes in code (Option " + opt + ")";
@@ -212,20 +262,32 @@
     Array.prototype.forEach.call(document.querySelectorAll("#opt button"), function (b) {
       b.setAttribute("aria-pressed", String(+b.dataset.o === opt));
     });
+    $("week").value = idx;
   }
+  function stop() { if (timer) { clearInterval(timer); timer = null; $("play").innerHTML = "&#9654; Replay Meteor Mite"; } }
   Array.prototype.forEach.call(document.querySelectorAll("#opt button"), function (b) {
     b.onclick = function () { opt = +b.dataset.o; render(); };
   });
-  $("why").onclick = function () {
-    var box = $("whybox"), open = box.classList.toggle("hidden") === false;
-    this.setAttribute("aria-expanded", String(open));
+  $("week").oninput = function () { stop(); idx = +this.value; if (idx >= 7) noteOpen = true; render(); };
+  $("play").onclick = function () {
+    if (timer) { stop(); return; }
+    idx = 0; noteOpen = false; render();
+    $("play").innerHTML = "&#10074;&#10074; Pause";
+    timer = setInterval(function () {
+      if (idx >= 9) { stop(); return; }
+      idx += 1;
+      if (idx === 7) noteOpen = true;
+      render();
+    }, 1100);
   };
+  $("why").onclick = function () { noteOpen = !noteOpen; render(); };
   $("preview").onclick = function () { $("lock").classList.remove("hidden"); $("read").classList.add("hidden"); $("overlay").classList.remove("hidden"); };
   $("notif").onclick = function () { $("lock").classList.add("hidden"); $("read").classList.remove("hidden"); };
   $("back").onclick = function () { $("read").classList.add("hidden"); $("lock").classList.remove("hidden"); };
   $("close").onclick = function () { $("overlay").classList.add("hidden"); };
   $("overlay").onclick = function (e) { if (e.target === this) this.classList.add("hidden"); };
   document.querySelectorAll(".topnav a").forEach(function (a) { a.onclick = function (e) { e.preventDefault(); }; });
+  noteOpen = true;
   render();
 </script>
 </body>
