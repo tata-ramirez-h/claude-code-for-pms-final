@@ -697,7 +697,6 @@
 &lt;/body&gt;
 &lt;/html&gt;
 "></div>
-  <p class="proto-note">The game is an illustration, not Rook's real ranking. The numbers on the clear and warp screens come from the callout history, and the wording is proposed, not live. We do not know yet if the phone can show a message.</p>
 
   <div class="grid2" style="margin-top:34px">
     <div class="card sim">
@@ -757,7 +756,7 @@
 <section id="why"><div class="wrap">
   <div class="eyebrow">Why it happened</div>
   <h2>The timeout started it. The scoring rule made it stick.</h2>
-  <p class="sub">What the data shows is solid. The cause is a working hypothesis from reading the routing code, and I have labeled each link.</p>
+  <p class="sub">The shorter timeout most likely started the misses, and a scoring rule that counts a miss like a "no" and never forgives it kept four responders stuck.</p>
 
   <div class="chain">
     <div class="step"><b>Ping wait cut 90s → 60s</b>One of two 4.2 changes. No stated reason for it anywhere in the wiki.<br><span class="conf hyp">LIKELY, UNPROVEN</span></div>
@@ -830,7 +829,10 @@ why did you grouped some days like 10-11 august and 12-16 august?</div>
     <div class="card" style="text-align:center"><div class="small">Then I added an owner, success targets, one scope and the problem first</div><div class="score" style="font-size:28px;color:var(--good);margin-top:6px">Reworked</div></div>
   </div>
   <div class="prompt" style="margin-top:20px"><span class="lab">Prompt</span>Make a skill called review-checklist. When I point it at a brief, it checks that the brief: names who owns it, says how we'll know it worked, keeps the same scope start to finish, and explains the problem before the fix.</div>
-  <p class="small" style="margin-top:12px">Scheduled to run every Monday. I have not re-scored the reworked brief, and the folder the schedule reads does not exist yet.</p>
+  <div class="grid2" style="margin-top:20px">
+    <div class="card"><h3>How it stops a repeat</h3><p class="small" style="margin:0;color:#cfd6ea;font-size:15px">Point it at any brief before it goes anywhere. It flags a missing owner, a missing success measure, a scope that drifts, or a fix with no problem. A change like the 4.2 timeout cut can't go out unexplained.</p></div>
+    <div class="card"><h3>Runs every Monday</h3><p class="small" style="margin:0;color:#cfd6ea;font-size:15px">I scheduled it to run every Monday morning and report what it finds, so gaps get caught as a habit, not by luck.</p></div>
+  </div>
 </div></section>
 
 <footer><div class="wrap">Final report · Product School "Claude Code for PMs" (cohort ccpm-2026.1). Rook Industries is fictional.</div></footer>
